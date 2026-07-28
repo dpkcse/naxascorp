@@ -1,7 +1,11 @@
 <?php
 
 use App\Domain\Installation\DatabaseConnectionTester;
+use App\Domain\Installation\DatabaseConfigurationActivator;
+use App\Domain\Installation\DatabaseConfigurationStore;
+use App\Domain\Installation\DatabaseProvisioner;
 use App\Domain\Installation\DTOs\DatabaseConnectionResult;
+use App\Domain\Installation\DTOs\DatabaseProvisioningResult;
 use App\Domain\Installation\InstallationState;
 use Illuminate\Support\Facades\Log;
 use Livewire\Volt\Volt;
@@ -29,13 +33,16 @@ test('database fields are validated on the server', function () {
 test('successful connection marks database verification and clears the password', function () {
     $tester = mock(DatabaseConnectionTester::class);
     $tester->shouldReceive('test')->once()->andReturn(DatabaseConnectionResult::success());
+    mock(DatabaseConfigurationStore::class)->shouldReceive('put')->once();
+    mock(DatabaseConfigurationActivator::class)->shouldReceive('activate')->once()->andReturnTrue();
+    mock(DatabaseProvisioner::class)->shouldReceive('prepare')->once()->andReturn(DatabaseProvisioningResult::success());
 
     Volt::test('installer.database')
         ->set('host', '127.0.0.1')->set('port', 3306)->set('database', 'naxora')
         ->set('username', 'naxora_user')->set('password', 'highly-sensitive-value')
         ->call('testConnection')
         ->assertSet('password', '')
-        ->assertSee('verified successfully')
+        ->assertRedirect(route('installer.administrator'))
         ->assertDontSee('highly-sensitive-value');
 
     expect(app(InstallationState::class)->hasCompleted('database_connection_verified'))->toBeTrue()
@@ -58,6 +65,19 @@ test('connection failure is safe and invalidates database verification', functio
 
     Log::shouldNotHaveReceived('error');
     expect(app(InstallationState::class)->hasCompleted('database_connection_verified'))->toBeFalse();
+});
+
+test('failed migration does not mark database or administrator complete', function () {
+    $tester = mock(DatabaseConnectionTester::class);
+    $tester->shouldReceive('test')->once()->andReturn(DatabaseConnectionResult::success());
+    mock(DatabaseConfigurationStore::class)->shouldReceive('put')->once();
+    mock(DatabaseConfigurationActivator::class)->shouldReceive('activate')->once()->andReturnTrue();
+    mock(DatabaseProvisioner::class)->shouldReceive('prepare')->once()->andReturn(DatabaseProvisioningResult::failure());
+
+    Volt::test('installer.database')->set('database', 'naxora')->set('username', 'user')->call('testConnection')->assertSee('could not be prepared safely');
+
+    expect(app(InstallationState::class)->hasCompleted('database_connection_verified'))->toBeFalse()
+        ->and(app(InstallationState::class)->hasCompleted('administrator_created'))->toBeFalse();
 });
 
 test('changing database fields invalidates prior verification', function () {

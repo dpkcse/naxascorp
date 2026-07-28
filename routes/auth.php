@@ -8,7 +8,7 @@ Route::middleware('guest')->group(function () {
     Volt::route('login', 'auth.login')
         ->name('login');
 
-    Volt::route('register', 'auth.register')
+    Volt::route('register', 'auth.register')->middleware('registration.closed')
         ->name('register');
 
     Volt::route('forgot-password', 'auth.forgot-password')
@@ -19,7 +19,7 @@ Route::middleware('guest')->group(function () {
 
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'administrator.active'])->group(function () {
     Volt::route('verify-email', 'auth.verify-email')
         ->name('verification.notice');
 

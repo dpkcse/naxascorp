@@ -17,4 +17,10 @@ Route::middleware(['web', 'installer.accessible', 'installer.protected'])
         Volt::route('/database', 'installer.database')
             ->middleware('installer.previous:database_connection_verified')
             ->name('database');
+        Volt::route('/administrator', 'installer.administrator')
+            ->middleware('installer.previous:administrator_created')
+            ->name('administrator');
+        Volt::route('/handoff', 'installer.handoff')
+            ->middleware('administrator.created')
+            ->name('handoff');
     });

@@ -28,7 +28,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password, 'is_active' => true], $this->remember)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -37,6 +37,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         }
 
         RateLimiter::clear($this->throttleKey());
+        Auth::user()->forceFill(['last_login_at' => now()])->save();
         Session::regenerate();
 
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
@@ -109,8 +110,4 @@ new #[Layout('components.layouts.auth')] class extends Component {
         </div>
     </form>
 
-    <div class="space-x-1 text-center text-sm text-zinc-600 dark:text-zinc-400">
-        Don't have an account?
-        <x-text-link href="{{ route('register') }}">Sign up</x-text-link>
-    </div>
 </div>

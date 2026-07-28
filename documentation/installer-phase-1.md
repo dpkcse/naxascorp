@@ -107,3 +107,7 @@ After validation, manually visit each installer route on mobile and desktop, con
 ## Phase 2 handoff
 
 Phase 2 must add administrator creation, enforce initial administrator uniqueness, disable public registration at the correct lifecycle point, integrate the administrator with existing authentication, and define safe installer resume behavior following administrator creation. It must also determine when and how the final installed marker is written. None of those behaviors are present in Phase 1.
+
+## Phase 2 handoff update
+
+Phase 2 now securely bridges verified database credentials through encrypted server-only installer storage, runs only pending application migrations after schema conflict checks, and continues to administrator setup. Phase 1's isolated connection test and pre-database cookie progress remain unchanged; credentials are still never stored in the cookie session or rendered response.

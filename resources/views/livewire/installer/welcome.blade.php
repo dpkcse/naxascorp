@@ -20,7 +20,7 @@ new class extends Component {
             <span class="w-fit rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold tracking-wide text-blue-700 uppercase">Premium Corporate Website CMS</span>
             <div class="flex flex-col gap-3">
                 <h1 class="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Welcome to Naxora CMS</h1>
-                <p class="max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">This guided setup will check your server, confirm safe file access, and verify your MySQL database connection. It will not create an administrator or modify your database in this phase.</p>
+                <p class="max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">This guided setup checks your server, confirms safe file access, prepares your verified MySQL database, and creates the initial administrator account.</p>
             </div>
         </div>
 
