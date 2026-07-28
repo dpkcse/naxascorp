@@ -1,24 +1,11 @@
 <?php
 
-use Livewire\Volt\Volt;
-
-test('registration screen can be rendered', function () {
-    $response = $this->get('/register');
-
-    $response->assertStatus(200);
+test('public registration redirects to login', function () {
+    $this->get('/register')->assertRedirect(route('login'));
 });
 
-test('new users can register', function () {
-    $response = Volt::test('auth.register')
-        ->set('name', 'Test User')
-        ->set('email', 'test@example.com')
-        ->set('password', 'password')
-        ->set('password_confirmation', 'password')
-        ->call('register');
+test('registration cannot create an account before administrator setup', function () {
+    Livewire\Volt\Volt::test('auth.register')->call('register')->assertRedirect(route('installer.welcome'));
 
-    $response
-        ->assertHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
-
-    $this->assertAuthenticated();
+    expect(App\Models\User::query()->count())->toBe(0);
 });

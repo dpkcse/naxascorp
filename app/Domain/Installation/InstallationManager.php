@@ -4,7 +4,7 @@ namespace App\Domain\Installation;
 
 class InstallationManager
 {
-    public function __construct(private readonly InstallationState $state) {}
+    public function __construct(private readonly InstallationState $state, private readonly AdministratorLifecycle $administratorLifecycle) {}
 
     public function isInstalled(): bool
     {
@@ -13,6 +13,10 @@ class InstallationManager
 
     public function canAccess(string $step): bool
     {
+        if ($step === 'administrator_created' && $this->administratorLifecycle->hasAdministrator()) {
+            return true;
+        }
+
         return $this->state->previousStepIsComplete($step);
     }
 
@@ -22,6 +26,7 @@ class InstallationManager
             'requirements_passed' => 'installer.welcome',
             'permissions_passed' => 'installer.requirements',
             'database_connection_verified' => 'installer.permissions',
+            'administrator_created' => 'installer.database',
         ][$step] ?? 'installer.welcome';
     }
 }

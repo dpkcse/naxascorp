@@ -11,6 +11,7 @@ class InstallationState
         'requirements_passed',
         'permissions_passed',
         'database_connection_verified',
+        'administrator_created',
     ];
 
     public function __construct(private readonly Session $session) {}

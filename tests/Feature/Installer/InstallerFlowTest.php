@@ -24,6 +24,7 @@ test('direct installer urls cannot skip prerequisite steps', function () {
     $this->get('/install/requirements')->assertRedirect(route('installer.welcome'));
     $this->get('/install/permissions')->assertRedirect(route('installer.requirements'));
     $this->get('/install/database')->assertRedirect(route('installer.permissions'));
+    $this->get('/install/administrator')->assertRedirect(route('installer.database'));
 });
 
 test('welcome action marks only welcome complete', function () {
@@ -94,6 +95,6 @@ test('direct livewire actions cannot bypass prerequisites', function () {
 
 test('authentication routes remain available', function () {
     $this->get('/login')->assertSuccessful();
-    $this->get('/register')->assertSuccessful();
+    $this->get('/register')->assertRedirect(route('login'));
     $this->get('/forgot-password')->assertSuccessful();
 });
