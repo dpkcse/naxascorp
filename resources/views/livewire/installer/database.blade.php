@@ -98,7 +98,7 @@ new class extends Component {
 <x-layouts.installer :current-step="4">
     <x-slot:title>Database connection</x-slot:title>
     <div class="flex flex-col gap-7">
-        <div><p class="text-sm font-semibold text-blue-700">Step 4 of 5</p><h1 class="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Connect your database</h1><p class="mt-3 leading-6 text-slate-600">We first perform a harmless connection test. After verification, only pending Naxora migrations run; existing or unrecognized schemas are never overwritten.</p></div>
+        <div><p class="text-sm font-semibold text-blue-700">Step 4 of 7</p><h1 class="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Connect your database</h1><p class="mt-3 leading-6 text-slate-600">We first perform a harmless connection test. After verification, only pending Naxora migrations run; existing or unrecognized schemas are never overwritten.</p></div>
 
         @if ($errors->any())<div role="alert" class="rounded-xl border border-red-200 bg-red-50 p-4"><p class="font-semibold text-red-900">Please review the highlighted fields.</p><ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-red-800">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
         @if ($connectionMessage)<div role="status" class="rounded-xl border p-4 text-sm font-medium {{ $connectionSuccessful ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-800' }}">{{ $connectionMessage }}</div>@endif

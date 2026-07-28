@@ -6,7 +6,7 @@ Phase 2 extends Naxora CMS from database verification through creation of one ac
 
 ## Flow and routes
 
-The ordered flow is `GET /install` → `/install/requirements` → `/install/permissions` → `/install/database` → `/install/administrator`. Successful account creation leads to `/install/handoff`, which states that Phase 3 license activation is still required. Installer routes retain web/CSRF behavior, prerequisite enforcement, no-store headers, and noindex/nofollow protection.
+The ordered flow is `GET /install` → `/install/requirements` → `/install/permissions` → `/install/database` → `/install/administrator`. At the Phase 2 boundary, successful account creation led to `/install/handoff`; Phase 3 now continues directly to `/install/license`. Installer routes retain web/CSRF behavior, prerequisite enforcement, no-store headers, and noindex/nofollow protection.
 
 ## Database handoff decision
 
@@ -24,7 +24,7 @@ The normal migrations add `users.is_active`, `users.last_login_at`, and the mini
 
 `InitialAdministratorCreator` independently rechecks the database installer step, activates the secured connection, checks required tables and columns, and opens a transaction. The durable `administrator_created` primary-key record and the empty-users requirement protect initial-account uniqueness; a concurrent duplicate insert rolls back. The service trims/squishes the name, lowercases the email, hashes the password using the configured hasher, and creates an active `User`. It returns a typed result without the password.
 
-The Volt form requires a name of at most 120 characters, a normalized valid unique email, and a confirmed password of at least 12 characters containing mixed case, a number, and a symbol. Attempts are rate-limited. Both password properties are cleared in a `finally` block after every outcome. Success marks only the temporary `administrator_created` step, authenticates the new administrator, regenerates the session, and redirects to the Phase 3 handoff. No installed marker is written.
+The Volt form requires a name of at most 120 characters, a normalized valid unique email, and a confirmed password of at least 12 characters containing mixed case, a number, and a symbol. Attempts are rate-limited. Both password properties are cleared in a `finally` block after every outcome. Success marks only the temporary `administrator_created` step, authenticates the new administrator, regenerates the session, and redirects to the Phase 3 license route. No installed marker is written.
 
 The durable progress record reconciles lost cookie progress: it is the only database fact accepted as evidence that this installer created the administrator. An arbitrary user record is treated as a conflict, never as completed setup.
 
@@ -75,4 +75,4 @@ For a safe migration check, back up the local validation database, run `php arti
 
 ## Known limitations and Phase 3 handoff
 
-Phase 2 intentionally has no installer recovery UI for conflicting schemas or lost encrypted handoff keys. It does not finalize environment/platform secret management. It also does not finish installation: `/install/handoff` explicitly requires Phase 3 licensing. Phase 3 should consume the authenticated active administrator context and durable progress record without changing the uniqueness rule or inventing roles.
+Phase 2 intentionally has no installer recovery UI for conflicting schemas or lost encrypted handoff keys. It does not finalize environment/platform secret management. It also does not finish installation. Phase 3 consumes the authenticated active administrator context and durable progress record without changing the uniqueness rule or inventing roles.

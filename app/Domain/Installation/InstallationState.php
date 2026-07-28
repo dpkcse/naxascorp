@@ -12,6 +12,9 @@ class InstallationState
         'permissions_passed',
         'database_connection_verified',
         'administrator_created',
+        'license_request_created',
+        'license_entitlement_verified',
+        'license_acknowledged',
     ];
 
     public function __construct(private readonly Session $session) {}

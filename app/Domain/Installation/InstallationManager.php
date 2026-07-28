@@ -27,6 +27,9 @@ class InstallationManager
             'permissions_passed' => 'installer.requirements',
             'database_connection_verified' => 'installer.permissions',
             'administrator_created' => 'installer.database',
+            'license_request_created' => 'installer.administrator',
+            'license_entitlement_verified' => 'installer.license',
+            'license_acknowledged' => 'installer.license',
         ][$step] ?? 'installer.welcome';
     }
 }
