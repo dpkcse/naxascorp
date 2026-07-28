@@ -1,0 +1,3 @@
+@props(['type' => 'info', 'title' => null])
+@php $classes = match($type) {'success' => 'border-emerald-300 bg-emerald-50 text-emerald-950', 'warning' => 'border-amber-300 bg-amber-50 text-amber-950', 'error' => 'border-red-300 bg-red-50 text-red-950', default => 'border-blue-300 bg-blue-50 text-blue-950'}; @endphp
+<div {{ $attributes->merge(['class' => "rounded-lg border p-4 $classes"]) }} role="{{ $type === 'error' ? 'alert' : 'status' }}" aria-live="{{ $type === 'error' ? 'assertive' : 'polite' }}">@if($title)<p class="font-bold">{{ $title }}</p>@endif<div class="mt-1 text-sm leading-6">{{ $slot }}</div></div>

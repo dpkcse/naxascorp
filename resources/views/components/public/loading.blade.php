@@ -1,0 +1,2 @@
+@props(['label' => 'Loading content'])
+<div {{ $attributes->merge(['class' => 'grid animate-pulse gap-3 rounded-public border border-public-border p-6 motion-reduce:animate-none']) }} role="status" aria-label="{{ $label }}"><span class="h-5 w-2/5 rounded bg-slate-200"></span><span class="h-4 w-full rounded bg-slate-100"></span><span class="h-4 w-4/5 rounded bg-slate-100"></span><span class="sr-only">{{ $label }}</span></div>
