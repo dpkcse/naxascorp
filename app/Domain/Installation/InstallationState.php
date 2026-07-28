@@ -15,6 +15,9 @@ class InstallationState
         'license_request_created',
         'license_entitlement_verified',
         'license_acknowledged',
+        'website_settings_saved',
+        'demo_content_selected',
+        'installation_completed',
     ];
 
     public function __construct(private readonly Session $session) {}

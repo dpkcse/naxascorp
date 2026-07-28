@@ -10,7 +10,7 @@ use Throwable;
 
 class DatabaseProvisioner
 {
-    private const ApplicationTables = ['cache', 'cache_locks', 'failed_jobs', 'installation_progress', 'job_batches', 'jobs', 'migrations', 'password_reset_tokens', 'sessions', 'users'];
+    private const ApplicationTables = ['cache', 'cache_locks', 'failed_jobs', 'installation_choices', 'installation_progress', 'job_batches', 'jobs', 'license_states', 'migrations', 'password_reset_tokens', 'sessions', 'users', 'website_settings'];
 
     public function __construct(private readonly DatabaseManager $database, private readonly Kernel $artisan) {}
 
