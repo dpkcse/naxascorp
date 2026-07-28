@@ -15,7 +15,7 @@ class EnsureInstallerAccessible
     public function handle(Request $request, Closure $next): Response|RedirectResponse
     {
         if ($this->manager->isInstalled()) {
-            return redirect()->route('home');
+            return redirect()->route($request->user()?->is_active ? 'dashboard' : 'login');
         }
 
         return $next($request);
