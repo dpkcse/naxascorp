@@ -1,13 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Livewire\Volt\Volt;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LicenseController;
+use App\Http\Controllers\PublicSiteController;
+use Illuminate\Support\Facades\Route;
+use Livewire\Volt\Volt;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', PublicSiteController::class)->name('home');
 
 Route::middleware(['auth', 'administrator.active', 'installed'])->group(function () {
     Route::get('dashboard', DashboardController::class)->middleware('verified')->name('dashboard');

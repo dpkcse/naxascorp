@@ -1,0 +1,6 @@
+@props(['src' => null, 'alt' => null, 'decorative' => false, 'width' => null, 'height' => null, 'loading' => 'lazy', 'fetchpriority' => 'auto', 'decoding' => 'async', 'srcset' => null, 'sizes' => null, 'aspect' => null])
+@php
+if (! $decorative && ($alt === null || trim($alt) === '')) { throw new InvalidArgumentException('Public images require alt text unless decorative.'); }
+if (! $width && ! $height && ! $aspect) { throw new InvalidArgumentException('Public images require dimensions or an aspect ratio.'); }
+@endphp
+<div {{ $attributes->class(['relative overflow-hidden bg-slate-100', $aspect]) }}>@if($src)<img src="{{ $src }}" alt="{{ $decorative ? '' : $alt }}" @if($decorative) role="presentation" @endif @if($width) width="{{ $width }}" @endif @if($height) height="{{ $height }}" @endif loading="{{ $loading }}" fetchpriority="{{ $fetchpriority }}" decoding="{{ $decoding }}" @if($srcset) srcset="{{ $srcset }}" @endif @if($sizes) sizes="{{ $sizes }}" @endif class="h-full w-full object-cover">@else<div class="flex h-full min-h-40 items-center justify-center p-6 text-center text-sm text-public-muted" role="img" aria-label="{{ $decorative ? 'Decorative image unavailable' : $alt }}">Image unavailable</div>@endif</div>

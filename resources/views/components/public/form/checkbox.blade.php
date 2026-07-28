@@ -1,0 +1,3 @@
+@props(['name', 'label', 'value' => '1', 'required' => false])
+@php $id = $attributes->get('id', $name); $error = $errors->first($name); @endphp
+<div><label for="{{ $id }}" class="flex min-h-11 cursor-pointer items-start gap-3 text-sm leading-6 text-public-secondary"><input id="{{ $id }}" name="{{ $name }}" value="{{ $value }}" type="checkbox" @required($required) @if($error) aria-invalid="true" aria-describedby="{{ $id }}-error" @endif {{ $attributes->except('id')->merge(['class' => 'mt-1 size-5 rounded border-public-border text-public-primary focus:ring-public-focus']) }}><span>{{ $label }}@if($required)<span class="sr-only"> required</span>@endif</span></label>@if($error)<p id="{{ $id }}-error" class="public-error">{{ $error }}</p>@endif</div>

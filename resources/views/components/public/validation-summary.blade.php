@@ -1,0 +1,2 @@
+@props(['errors' => null, 'title' => 'Please correct the following errors'])
+@if($errors && count($errors))<div role="alert" aria-labelledby="validation-summary-title" tabindex="-1" class="rounded-lg border border-red-300 bg-red-50 p-4 text-red-950"><p id="validation-summary-title" class="font-bold">{{ $title }}</p><ul class="mt-2 list-disc ps-5 text-sm">@foreach($errors as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
