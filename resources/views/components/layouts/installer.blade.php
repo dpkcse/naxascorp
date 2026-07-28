@@ -29,9 +29,9 @@
             <main class="mx-auto grid max-w-6xl gap-6 px-5 py-8 sm:px-8 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-10 lg:py-14">
                 <aside aria-label="Installation progress">
                     @php
-                        $steps = [1 => ['Welcome', 'Overview'], 2 => ['Requirements', 'Server readiness'], 3 => ['Permissions', 'File access'], 4 => ['Database', 'Connection and schema'], 5 => ['Administrator', 'Secure account']];
+                        $steps = [1 => ['Welcome', 'Overview'], 2 => ['Requirements', 'Server readiness'], 3 => ['Permissions', 'File access'], 4 => ['Database', 'Connection and schema'], 5 => ['Administrator', 'Secure account'], 6 => ['License', 'Portal activation'], 7 => ['Ready', 'Phase 4 handoff']];
                     @endphp
-                    <ol class="grid grid-cols-5 gap-2 lg:grid-cols-1 lg:gap-3">
+                    <ol class="grid grid-cols-7 gap-2 lg:grid-cols-1 lg:gap-3">
                         @foreach ($steps as $number => [$label, $description])
                             <li class="min-w-0 rounded-xl border px-2 py-3 lg:flex lg:items-center lg:gap-3 lg:px-4 {{ $number === $currentStep ? 'border-blue-500 bg-white shadow-sm' : ($number < $currentStep ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white/60') }}">
                                 <span class="mx-auto flex size-8 items-center justify-center rounded-full text-sm font-bold lg:mx-0 {{ $number === $currentStep ? 'bg-blue-600 text-white' : ($number < $currentStep ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600') }}">{{ $number < $currentStep ? '✓' : $number }}</span>

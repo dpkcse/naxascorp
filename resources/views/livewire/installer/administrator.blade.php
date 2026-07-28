@@ -19,7 +19,7 @@ new class extends Component {
     {
         if ($lifecycle->hasAdministrator()) {
             $state->markCompleted('administrator_created');
-            $this->redirectRoute('installer.handoff');
+            $this->redirectRoute('installer.license');
         }
     }
 
@@ -60,7 +60,7 @@ new class extends Component {
             RateLimiter::clear($key);
             Auth::login($result->administrator);
             session()->regenerate();
-            $this->redirectRoute('installer.handoff', navigate: true);
+            $this->redirectRoute('installer.license', navigate: true);
         } finally {
             $this->reset('password', 'password_confirmation');
         }
@@ -72,7 +72,7 @@ new class extends Component {
 
     <div class="flex flex-col gap-7">
         <div class="flex flex-col gap-3">
-            <p class="text-sm font-semibold text-blue-700">Step 5 of 5</p>
+            <p class="text-sm font-semibold text-blue-700">Step 5 of 7</p>
             <h1 class="text-2xl font-bold tracking-tight sm:text-3xl">Administrator Account</h1>
             <p class="max-w-2xl leading-6 text-slate-600">Create the single account used to manage Naxora CMS. Choose a unique passphrase and store it in an approved password manager.</p>
         </div>

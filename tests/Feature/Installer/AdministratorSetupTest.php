@@ -51,7 +51,7 @@ test('initial administrator is normalized hashed active and created once', funct
         ->assertHasNoErrors()
         ->assertSet('password', '')
         ->assertSet('password_confirmation', '')
-        ->assertRedirect(route('installer.handoff'));
+        ->assertRedirect(route('installer.license'));
 
     $administrator = User::query()->sole();
     expect($administrator->name)->toBe('Alex Morgan')

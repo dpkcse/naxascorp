@@ -33,7 +33,7 @@ new class extends Component {
 <x-layouts.installer :current-step="2">
     <x-slot:title>Server requirements</x-slot:title>
     <div class="flex flex-col gap-7">
-        <div><p class="text-sm font-semibold text-blue-700">Step 2 of 4</p><h1 class="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Server requirements</h1><p class="mt-3 leading-6 text-slate-600">Required items must pass. Recommended items improve performance but do not block installation.</p></div>
+        <div><p class="text-sm font-semibold text-blue-700">Step 2 of 7</p><h1 class="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Server requirements</h1><p class="mt-3 leading-6 text-slate-600">Required items must pass. Recommended items improve performance but do not block installation.</p></div>
         @error('requirements') <div role="alert" class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-800">{{ $message }}</div> @enderror
         <div class="overflow-hidden rounded-xl border border-slate-200">
             @foreach ($this->requirements as $requirement)

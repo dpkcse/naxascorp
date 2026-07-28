@@ -23,4 +23,13 @@ Route::middleware(['web', 'installer.accessible', 'installer.protected'])
         Volt::route('/handoff', 'installer.handoff')
             ->middleware('administrator.created')
             ->name('handoff');
+        Volt::route('/license', 'installer.license')
+            ->middleware(['administrator.created', 'auth', 'administrator.active'])
+            ->name('license');
+        Volt::route('/license/diagnostics', 'installer.license-diagnostics')
+            ->middleware(['administrator.created', 'auth', 'administrator.active'])
+            ->name('license.diagnostics');
+        Volt::route('/ready', 'installer.ready')
+            ->middleware(['administrator.created', 'auth', 'administrator.active'])
+            ->name('ready');
     });
