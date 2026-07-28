@@ -1,0 +1,2 @@
+@props(['name', 'title', 'description' => null])
+<flux:modal :name="$name" class="max-w-lg" focusable><div role="document" aria-labelledby="{{ $name }}-title" @if($description) aria-describedby="{{ $name }}-description" @endif><flux:heading id="{{ $name }}-title" size="lg">{{ $title }}</flux:heading>@if($description)<flux:subheading id="{{ $name }}-description" class="mt-2">{{ $description }}</flux:subheading>@endif<div class="mt-6">{{ $slot }}</div>@isset($actions)<div class="mt-6 flex justify-end gap-3">{{ $actions }}</div>@endisset</div></flux:modal>

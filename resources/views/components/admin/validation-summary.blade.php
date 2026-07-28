@@ -1,0 +1,1 @@
+@if($errors->any())<x-admin.alert type="error" title="Please correct the following"><ul class="list-disc space-y-1 pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></x-admin.alert>@endif

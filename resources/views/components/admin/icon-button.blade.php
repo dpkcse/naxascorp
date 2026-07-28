@@ -1,0 +1,1 @@
+@props(['label'])<button aria-label="{{ $label }}" {{ $attributes->class(['inline-flex size-11 items-center justify-center rounded-md border border-slate-300 focus-visible:ring-2 focus-visible:ring-blue-600']) }}>{{ $slot }}</button>

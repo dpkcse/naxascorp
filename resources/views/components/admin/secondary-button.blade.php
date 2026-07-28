@@ -1,0 +1,2 @@
+@props(['href' => null])
+@if($href)<a href="{{ $href }}" {{ $attributes->class(['inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-600']) }}>{{ $slot }}</a>@else<button {{ $attributes->class(['inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 focus-visible:ring-2 focus-visible:ring-blue-600']) }}>{{ $slot }}</button>@endif
