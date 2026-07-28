@@ -1,0 +1,2 @@
+@props(['name', 'label', 'type' => 'text', 'help' => null, 'required' => false])
+<flux:field><flux:label>{{ $label }}@if($required)<span aria-hidden="true" class="text-red-600"> *</span><span class="sr-only"> required</span>@endif</flux:label><flux:input :name="$name" :type="$type" :required="$required" {{ $attributes }} />@if($help)<flux:description>{{ $help }}</flux:description>@endif<flux:error :name="$name" /></flux:field>

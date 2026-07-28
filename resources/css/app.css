@@ -26,6 +26,30 @@
     --color-accent: var(--color-neutral-800);
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
+    --color-navy-950: #071426;
+    --color-admin-background: #f4f7fb;
+    --color-admin-surface: #ffffff;
+    --color-admin-elevated: #ffffff;
+    --color-admin-text: #172033;
+    --color-admin-muted: #64748b;
+    --color-admin-border: #dce3ed;
+    --color-admin-primary: #175cd3;
+    --color-admin-success: #067647;
+    --color-admin-warning: #b54708;
+    --color-admin-danger: #b42318;
+    --color-admin-info: #175cd3;
+    --color-admin-focus: #2563eb;
+}
+
+[x-cloak] { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
 }
 
 @layer theme {

@@ -1,0 +1,2 @@
+@props(['type' => 'info', 'title' => null])
+<div role="{{ $type === 'error' ? 'alert' : 'status' }}" aria-live="polite" {{ $attributes->class(['rounded-lg border p-4 text-sm', $type === 'error' ? 'border-red-200 bg-red-50 text-red-900' : ($type === 'warning' ? 'border-amber-200 bg-amber-50 text-amber-950' : ($type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-900' : 'border-blue-200 bg-blue-50 text-blue-900'))]) }}>@if($title)<p class="font-semibold">{{ $title }}</p>@endif<div @class(['mt-1' => $title])>{{ $slot }}</div></div>

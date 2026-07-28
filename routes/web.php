@@ -2,14 +2,18 @@
 
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\LicenseController;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified', 'administrator.active'])
-    ->name('dashboard');
+Route::middleware(['auth', 'administrator.active', 'installed'])->group(function () {
+    Route::get('dashboard', DashboardController::class)->middleware('verified')->name('dashboard');
+    Route::get('system/license', [LicenseController::class, 'status'])->name('license.status');
+    Route::get('system/license/diagnostics', [LicenseController::class, 'diagnostics'])->name('license.diagnostics');
+});
 
 Route::middleware(['auth', 'administrator.active'])->group(function () {
     Route::redirect('settings', 'settings/profile');

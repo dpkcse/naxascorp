@@ -1,18 +1,30 @@
-<x-layouts.app>
-    <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
-        <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-                <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
-            </div>
-            <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-                <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
-            </div>
-            <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-                <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
-            </div>
-        </div>
-        <div class="relative h-full flex-1 rounded-xl border border-neutral-200 dark:border-neutral-700">
-            <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
-        </div>
+<x-layouts.app title="Dashboard" :breadcrumbs="[['label' => 'Dashboard']]">
+<div class="space-y-8">
+    <x-admin.page-header title="Welcome, {{ $administrator->name }}" description="A clear overview of your website, license, and system readiness.">
+        <x-slot:actions><x-admin.secondary-button :href="route('home')">View website</x-admin.secondary-button><x-admin.primary-button :href="route('settings.profile')">Website settings</x-admin.primary-button></x-slot:actions>
+    </x-admin.page-header>
+
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <x-admin.stat-card label="Website" :value="$website?->site_name ?? 'Not configured'" :hint="$website?->site_url" />
+        <x-admin.stat-card label="License health" :value="$licenseStatus" hint="Locally verified entitlement state" />
+        <x-admin.stat-card label="CMS version" :value="config('app.version', '1.0.0')" hint="Naxora CMS" />
+        <x-admin.stat-card label="Administrator" :value="$administrator->is_active ? 'Active' : 'Inactive'" :hint="$administrator->email" />
     </div>
+
+    <div class="grid gap-6 xl:grid-cols-2">
+        <x-admin.card title="Website settings" description="Current singleton website configuration."><dl class="grid gap-4 text-sm sm:grid-cols-2">@foreach(['Site name' => $website?->site_name, 'Legal organization' => $website?->legal_name, 'Site URL' => $website?->site_url, 'Locale' => $website?->default_locale, 'Timezone' => $website?->timezone] as $label => $value)<div><dt class="text-slate-500">{{ $label }}</dt><dd class="mt-1 break-words font-semibold text-slate-900">{{ $value ?: 'Not configured' }}</dd></div>@endforeach</dl></x-admin.card>
+        <x-admin.card title="License" description="Safe, locally verified license summary."><div class="mb-4"><x-admin.status-badge :status="$licenseStatus === 'Active' ? 'active' : 'warning'">{{ $licenseStatus }}</x-admin.status-badge></div><dl class="grid gap-4 text-sm sm:grid-cols-2"><div><dt class="text-slate-500">Product</dt><dd class="font-semibold">Naxora CMS</dd></div><div><dt class="text-slate-500">License type</dt><dd class="font-semibold">{{ $license?->license_type ?? config('naxas-license.license_type') }}</dd></div><div><dt class="text-slate-500">Domain</dt><dd class="break-words font-semibold">{{ $license?->normalized_domain ?? 'Unavailable' }}</dd></div><div><dt class="text-slate-500">Acknowledged</dt><dd class="font-semibold">{{ $license?->acknowledged_at?->toDayDateTimeString() ?? 'Not acknowledged' }}</dd></div></dl><div class="mt-5 flex flex-wrap gap-2"><x-admin.secondary-button :href="route('license.status')">License status</x-admin.secondary-button><x-admin.secondary-button :href="route('license.diagnostics')">Diagnostics</x-admin.secondary-button></div></x-admin.card>
+        <x-admin.card title="System" description="Safe application runtime details."><dl class="grid gap-4 text-sm sm:grid-cols-2"><div><dt class="text-slate-500">Laravel</dt><dd class="font-semibold">{{ app()->version() }}</dd></div><div><dt class="text-slate-500">PHP</dt><dd class="font-semibold">{{ PHP_VERSION }}</dd></div><div><dt class="text-slate-500">Environment</dt><dd class="font-semibold">{{ app()->environment() }}</dd></div><div><dt class="text-slate-500">Installed state</dt><dd class="font-semibold">Completed</dd></div></dl></x-admin.card>
+        <x-admin.card title="Administrator" description="Your safe account summary."><dl class="grid gap-4 text-sm sm:grid-cols-2"><div><dt class="text-slate-500">Name</dt><dd class="font-semibold">{{ $administrator->name }}</dd></div><div><dt class="text-slate-500">Email</dt><dd class="break-words font-semibold">{{ $administrator->email }}</dd></div><div><dt class="text-slate-500">Last login</dt><dd class="font-semibold">{{ $administrator->last_login_at?->toDayDateTimeString() ?? 'Not recorded' }}</dd></div><div><dt class="text-slate-500">Account</dt><dd><x-admin.status-badge status="healthy">Active administrator</x-admin.status-badge></dd></div></dl></x-admin.card>
+    </div>
+
+    <x-admin.card title="System health" description="Bounded local checks only; no external calls or destructive actions."><div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">@foreach($healthChecks as $check)<div class="rounded-lg border border-slate-200 p-4"><div class="flex items-start justify-between gap-2"><h3 class="text-sm font-semibold">{{ $check['label'] }}</h3><x-admin.status-badge :status="$check['status']">{{ str_replace('-', ' ', ucfirst($check['status'])) }}</x-admin.status-badge></div><p class="mt-2 text-xs leading-5 text-slate-500">{{ $check['message'] }}</p></div>@endforeach</div></x-admin.card>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+        <x-admin.card title="Content and communication" description="Future modules are intentionally not represented as live data."><div class="space-y-3"><x-admin.alert>Pages module not yet configured.</x-admin.alert><x-admin.alert>Media Library is coming in a later phase.</x-admin.alert><x-admin.alert>No enquiry module is installed yet.</x-admin.alert></div></x-admin.card>
+        <x-admin.card title="Recent activity" description="Activity persistence will be introduced in a later phase."><x-admin.empty-state title="No recent activity available" description="No activity is fabricated. This area is ready for a future audit-log data source." /></x-admin.card>
+    </div>
+
+    <x-admin.card title="Setup readiness checklist"><ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">@foreach([['Installation completed', true], ['Administrator active', (bool) $administrator->is_active], ['Website settings configured', (bool) $website], ['License acknowledged and valid', $licenseStatus === 'Active'], ['Public registration disabled', true], ['Storage writable', collect($healthChecks)->firstWhere('label', 'Storage')['status'] === 'healthy'], ['Mail configuration reviewed', config('mail.default') !== 'log'], ['Public website design pending', false], ['CMS modules pending', false]] as [$label, $complete])<li class="flex items-center gap-3 rounded-lg border border-slate-200 p-3"><x-admin.status-badge :status="$complete ? 'healthy' : 'pending'">{{ $complete ? 'Complete' : 'Pending' }}</x-admin.status-badge><span class="text-sm font-medium">{{ $label }}</span></li>@endforeach</ul></x-admin.card>
+</div>
 </x-layouts.app>
