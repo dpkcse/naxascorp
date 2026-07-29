@@ -31,4 +31,9 @@ class Page extends Model
                 ->orWhere(fn (Builder $scheduled) => $scheduled->where('status', 'scheduled')->whereNotNull('scheduled_for')->where('scheduled_for', '<=', now()));
         })->whereNull('archived_at');
     }
+
+    public function isPubliclyVisible(): bool
+    {
+        return $this->archived_at === null && (($this->status === 'published' && $this->published_at?->lte(now())) || ($this->status === 'scheduled' && $this->scheduled_for?->lte(now())));
+    }
 }

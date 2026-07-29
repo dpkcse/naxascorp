@@ -1,0 +1,3 @@
+<?php
+namespace App\Domain\Solutions;
+final class SolutionRegistry { public const TEMPLATES=['standard','detailed','enterprise','government','technology']; public const HERO_STYLES=['standard','split','centered','minimal']; public const ICONS=['briefcase','building-office','check-circle','cloud','cog-6-tooth','globe-alt','light-bulb','lock-closed','rocket-launch','server-stack','shield-check','sparkles']; public const CHILDREN=['features'=>12,'benefits'=>12,'capabilities'=>12,'processSteps'=>8,'useCases'=>12]; public const RESERVED=['create','edit','preview','admin','api','install','login','register','dashboard','sitemap.xml']; }

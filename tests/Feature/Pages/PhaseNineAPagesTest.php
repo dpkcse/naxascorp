@@ -90,5 +90,5 @@ test('sitemap includes only published indexable pages and public pages make no p
 });
 
 test('phase nine a adds no later modules roles permissions media or Gumroad', function () {
-    expect(Schema::hasTable('roles'))->toBeFalse()->and(Schema::hasTable('permissions'))->toBeFalse()->and(Schema::hasTable('media'))->toBeFalse()->and(Schema::hasTable('solutions'))->toBeFalse()->and(Schema::hasTable('products'))->toBeFalse();
+    expect(Schema::hasTable('roles'))->toBeFalse()->and(Schema::hasTable('permissions'))->toBeFalse()->and(Schema::hasTable('media'))->toBeFalse()->and(Schema::hasTable('products'))->toBeFalse();
 });

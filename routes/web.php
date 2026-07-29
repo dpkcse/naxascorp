@@ -6,7 +6,10 @@ use App\Http\Controllers\Admin\HomepageController;
 use App\Http\Controllers\Admin\PublicChromeController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PageSectionController;
+use App\Http\Controllers\Admin\SolutionChildController;
+use App\Http\Controllers\Admin\SolutionController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\PublicSolutionController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +17,8 @@ use Livewire\Volt\Volt;
 
 Route::get('/', PublicSiteController::class)->name('home');
 Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('solutions', [PublicSolutionController::class, 'index'])->name('solutions.index');
+Route::get('solutions/{solution}', [PublicSolutionController::class, 'show'])->where('solution', '[a-z0-9]+(?:-[a-z0-9]+)*')->name('solutions.show');
 
 Route::middleware(['auth', 'administrator.active', 'installed'])->group(function () {
     Route::get('dashboard', DashboardController::class)->middleware('verified')->name('dashboard');
@@ -50,6 +55,13 @@ Route::middleware(['auth', 'administrator.active', 'installed'])->group(function
         Route::post('{page}/archive', [PageController::class, 'archive'])->name('archive'); Route::post('{page}/restore', [PageController::class, 'restore'])->name('restore'); Route::post('{page}/duplicate', [PageController::class, 'duplicate'])->name('duplicate');
         Route::post('{page}/move-up', [PageController::class, 'move'])->defaults('direction', 'up')->name('move-up'); Route::post('{page}/move-down', [PageController::class, 'move'])->defaults('direction', 'down')->name('move-down'); Route::get('{page}/preview', [PageController::class, 'preview'])->name('preview');
         Route::post('{page}/sections', [PageSectionController::class, 'store'])->name('sections.store'); Route::match(['put', 'patch'], '{page}/sections/{section}', [PageSectionController::class, 'update'])->name('sections.update'); Route::delete('{page}/sections/{section}', [PageSectionController::class, 'destroy'])->name('sections.destroy'); Route::post('{page}/sections/{section}/move', [PageSectionController::class, 'move'])->name('sections.move');
+    });
+
+    Route::prefix('content/solutions')->name('admin.solutions.')->middleware('throttle:60,1')->group(function () {
+        Route::get('/', [SolutionController::class, 'index'])->name('index'); Route::get('create', [SolutionController::class, 'create'])->name('create'); Route::post('/', [SolutionController::class, 'store'])->name('store');
+        Route::get('categories', [SolutionController::class, 'categories'])->name('categories.index'); Route::post('categories', [SolutionController::class, 'storeCategory'])->name('categories.store'); Route::match(['put', 'patch'], 'categories/{category}', [SolutionController::class, 'updateCategory'])->name('categories.update'); Route::post('categories/{category}/move-up', [SolutionController::class, 'moveCategory'])->defaults('direction', 'up')->name('categories.move-up'); Route::post('categories/{category}/move-down', [SolutionController::class, 'moveCategory'])->defaults('direction', 'down')->name('categories.move-down');
+        Route::get('{solution}/edit', [SolutionController::class, 'edit'])->name('edit'); Route::match(['put', 'patch'], '{solution}', [SolutionController::class, 'update'])->name('update'); Route::post('{solution}/publish', [SolutionController::class, 'publish'])->name('publish'); Route::post('{solution}/schedule', [SolutionController::class, 'schedule'])->name('schedule'); Route::post('{solution}/unpublish', [SolutionController::class, 'unpublish'])->name('unpublish'); Route::post('{solution}/archive', [SolutionController::class, 'archive'])->name('archive'); Route::post('{solution}/restore', [SolutionController::class, 'restore'])->name('restore'); Route::post('{solution}/duplicate', [SolutionController::class, 'duplicate'])->name('duplicate'); Route::post('{solution}/move-up', [SolutionController::class, 'move'])->defaults('direction', 'up')->name('move-up'); Route::post('{solution}/move-down', [SolutionController::class, 'move'])->defaults('direction', 'down')->name('move-down'); Route::get('{solution}/preview', [SolutionController::class, 'preview'])->name('preview'); Route::post('{solution}/relations', [SolutionController::class, 'relations'])->name('relations');
+        Route::post('{solution}/{type}', [SolutionChildController::class, 'store'])->where('type', 'features|benefits|capabilities|process-steps|use-cases')->name('children.store'); Route::match(['put', 'patch'], '{solution}/{type}/{child}', [SolutionChildController::class, 'update'])->where('type', 'features|benefits|capabilities|process-steps|use-cases')->name('children.update'); Route::delete('{solution}/{type}/{child}', [SolutionChildController::class, 'destroy'])->where('type', 'features|benefits|capabilities|process-steps|use-cases')->name('children.destroy'); Route::post('{solution}/{type}/{child}/move', [SolutionChildController::class, 'move'])->where('type', 'features|benefits|capabilities|process-steps|use-cases')->name('children.move');
     });
 });
 
