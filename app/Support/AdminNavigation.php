@@ -9,7 +9,7 @@ class AdminNavigation
     {
         return [
             ['label' => 'Overview', 'items' => [['label' => 'Dashboard', 'route' => 'dashboard']]],
-            ['label' => 'Website', 'items' => array_merge(self::disabled(['Homepage', 'Pages']), [
+            ['label' => 'Website', 'items' => array_merge([['label' => 'Homepage', 'route' => 'admin.homepage.edit']], self::disabled(['Pages']), [
                 ['label' => 'Navigation', 'route' => 'admin.navigation.index'], ['label' => 'Header', 'route' => 'admin.header.edit'], ['label' => 'Footer', 'route' => 'admin.footer.edit'], ['label' => 'Branding', 'route' => 'admin.branding.edit'],
             ])],
             ['label' => 'Content', 'items' => self::disabled(['Solutions', 'Products', 'Industries', 'Capabilities', 'Work Process', 'Clients', 'Testimonials', 'Statistics'])],
