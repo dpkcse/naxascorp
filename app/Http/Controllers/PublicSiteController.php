@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Installation\WebsiteSettings;
+use App\Domain\Homepage\HomepageViewData;
 use App\Domain\PublicChrome\PublicChrome;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -10,8 +11,16 @@ use Throwable;
 
 class PublicSiteController extends Controller
 {
-    public function __invoke(Request $request, WebsiteSettings $websiteSettings, PublicChrome $publicChrome): View
+    public function __invoke(Request $request, HomepageViewData $homepage): View
     {
+        return view('homepage', ['homepage' => $homepage->published(), 'preview' => false] + $this->sharedViewData($request));
+    }
+
+    /** @return array<string, mixed> */
+    public function sharedViewData(Request $request): array
+    {
+        $websiteSettings = app(WebsiteSettings::class);
+        $publicChrome = app(PublicChrome::class);
         try {
             $settings = $websiteSettings->current();
         } catch (Throwable) {
@@ -23,7 +32,7 @@ class PublicSiteController extends Controller
         $siteName = $settings?->site_name ?: 'Naxora CMS';
         $canonical = rtrim($settings?->site_url ?: $request->root(), '/').'/';
 
-        return view('welcome', [
+        return [
             'settings' => $settings,
             'siteName' => $siteName,
             'legalName' => $settings?->legal_name ?: 'Naxas Innovations Limited',
@@ -32,6 +41,6 @@ class PublicSiteController extends Controller
             'canonical' => $canonical,
             'navigation' => $chrome['navigation'],
             'chrome' => $chrome,
-        ]);
+        ];
     }
 }
