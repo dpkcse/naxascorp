@@ -8,9 +8,9 @@ class PublicChrome
     {
         return $this->resolved ??= ['branding'=>$this->branding(),'header'=>$this->header(),'navigation'=>$this->navigation(),'footer'=>$this->footer()];
     }
-    private function cached(string $key, callable $loader, array $fallback): array
+    private function cached(string $key, callable $loader, array $fallback, int $minutes = 30): array
     {
-        try { return Cache::remember($key, now()->addMinutes(30), $loader); } catch (Throwable) { try { return $loader(); } catch (Throwable) { return $fallback; } }
+        try { return Cache::remember($key, now()->addMinutes($minutes), $loader); } catch (Throwable) { try { return $loader(); } catch (Throwable) { return $fallback; } }
     }
     private function branding(): array
     {
@@ -25,11 +25,11 @@ class PublicChrome
     private function navigation(): array
     {
         $fallback=[['id'=>'fallback-home','label'=>'Home','href'=>route('home'),'target'=>'_self','external'=>false,'route'=>'home','disabled'=>false,'featured'=>false,'mega'=>false,'description'=>null,'badge'=>null,'children'=>[]],['id'=>'fallback-company','label'=>'Company','href'=>null,'target'=>'_self','external'=>false,'route'=>null,'disabled'=>true,'featured'=>false,'mega'=>false,'description'=>null,'badge'=>null,'children'=>[]]];
-        return $this->cached(PublicChromeCache::PRIMARY,function() use($fallback){if(!Schema::hasTable('navigation_menus'))return $fallback;$menu=NavigationMenu::query()->where('location','primary')->where('is_active',true)->with(['items'=>fn($q)=>$q->where('is_active',true)->orderBy('display_order')->orderBy('id')->limit(100)])->first();if(!$menu)return $fallback;$items=$menu->items->groupBy('parent_id'); return $this->tree($items,null,1,3);},$fallback);
+        return $this->cached(PublicChromeCache::PRIMARY,function() use($fallback){if(!Schema::hasTable('navigation_menus'))return $fallback;$menu=NavigationMenu::query()->where('location','primary')->where('is_active',true)->with(['items'=>fn($q)=>$q->with('page')->where('is_active',true)->orderBy('display_order')->orderBy('id')->limit(100)])->first();if(!$menu)return $fallback;$items=$menu->items->groupBy('parent_id'); return $this->tree($items,null,1,3);},$fallback,1);
     }
     private function tree($groups, ?int $parent, int $depth, int $max): array
     {
-        if($depth>$max)return []; return $groups->get($parent,collect())->take($parent===null?12:20)->map(fn($item)=>['id'=>'nav-'.$item->id,'label'=>$item->label,'href'=>PublicLink::href($item->link_type,$item->route_name,$item->url),'target'=>$item->target,'external'=>PublicLink::isExternal($item->url),'route'=>$item->route_name,'disabled'=>$item->link_type==='disabled','featured'=>(bool)$item->is_featured,'mega'=>(bool)$item->opens_mega_menu,'description'=>$item->description,'badge'=>$item->badge_text,'children'=>$this->tree($groups,$item->id,$depth+1,$max)])->values()->all();
+        if($depth>$max)return []; return $groups->get($parent,collect())->take($parent===null?12:20)->map(function($item) use($groups,$depth,$max){$pageVisible=$item->link_type==='page'&&$item->page&&$item->page->status!=='archived'&&(($item->page->status==='published'&&$item->page->published_at?->lte(now()))||($item->page->status==='scheduled'&&$item->page->scheduled_for?->lte(now())));$href=$pageVisible?route('pages.show',$item->page->slug):PublicLink::href($item->link_type,$item->route_name,$item->url);return ['id'=>'nav-'.$item->id,'label'=>$item->label,'href'=>$href,'target'=>$item->target,'external'=>PublicLink::isExternal($item->url),'route'=>$item->route_name,'disabled'=>$item->link_type==='disabled'||($item->link_type==='page'&&!$pageVisible),'featured'=>(bool)$item->is_featured,'mega'=>(bool)$item->opens_mega_menu,'description'=>$item->description,'badge'=>$item->badge_text,'children'=>$this->tree($groups,$item->id,$depth+1,$max)];})->values()->all();
     }
     private function footer(): array
     {
