@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Models\HomepageItem;
 use App\Models\HomepageSection;
 use App\Models\HomepageSetting;
+use App\Models\Solution;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,7 +35,9 @@ class HomepageController extends Controller
         $definition = HomepageSectionRegistry::all()[$section] ?? abort(404);
         $record = HomepageSection::query()->where('section_key', $section)->with(['items' => fn ($query) => $query->orderBy('display_order')->orderBy('id')])->firstOrFail();
 
-        return view('admin.homepage.section', compact('definition', 'record'));
+        $solutions = Solution::query()->whereNull('archived_at')->orderBy('title')->get(['id', 'title', 'status']);
+
+        return view('admin.homepage.section', compact('definition', 'record', 'solutions'));
     }
 
     public function saveSettings(Request $request): RedirectResponse
@@ -140,6 +143,7 @@ class HomepageController extends Controller
         $definition = HomepageSectionRegistry::all()[$section->section_key];
         $type = $definition['item_type'];
         return [
+            'solution_id' => [$section->section_key === 'featured_solutions' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Solution::class, 'id')->whereNull('archived_at')],
             'item_type' => ['nullable', Rule::in(array_filter([$type, $definition['secondary_item_type']]))], 'title' => ['required', 'string', 'max:180'], 'eyebrow' => ['nullable', 'string', 'max:120'],
             'description' => ['nullable', 'string', 'max:'.($type === 'testimonial' ? 1000 : 1200)], 'secondary_text' => ['nullable', 'string', 'max:500'],
             'highlighted_text' => ['nullable', 'string', 'max:120'], 'icon' => ['nullable', Rule::in(HomepageSectionRegistry::ICONS)], 'badge' => ['nullable', 'string', 'max:60'],

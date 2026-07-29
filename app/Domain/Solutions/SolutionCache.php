@@ -1,0 +1,4 @@
+<?php
+namespace App\Domain\Solutions;
+use App\Domain\Homepage\HomepageCache; use App\Domain\PublicChrome\PublicChromeCache; use App\Models\{HomepageItem,NavigationItem}; use Illuminate\Support\Facades\Cache; use Throwable;
+final class SolutionCache { public static function version(int $id):int{try{return (int)Cache::rememberForever("public.solutions.version.$id",fn()=>hrtime(true));}catch(Throwable){return hrtime(true);}} public static function indexVersion():int{try{return (int)Cache::rememberForever('public.solutions.index.version',fn()=>hrtime(true));}catch(Throwable){return hrtime(true);}} public static function forget(int $id):void{try{Cache::put("public.solutions.version.$id",hrtime(true));Cache::put('public.solutions.index.version',hrtime(true));if(HomepageItem::where('solution_id',$id)->exists())HomepageCache::forget();if(NavigationItem::where('solution_id',$id)->exists())PublicChromeCache::forgetAll();}catch(Throwable){}} }

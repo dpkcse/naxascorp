@@ -1,0 +1,4 @@
+<?php
+namespace App\Http\Controllers;
+use App\Domain\Solutions\{SolutionIndexViewData,SolutionViewData}; use Illuminate\Contracts\View\View; use Illuminate\Http\Request;
+class PublicSolutionController extends Controller { public function index(Request $r,SolutionIndexViewData $data):View{$category=$r->validate(['category'=>['nullable','regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],'page'=>['nullable','integer','min:1']])['category']??null;$solutions=$data->get($category,max(1,$r->integer('page',1)));if($solutions['invalid'])abort(404);return view('solutions.index',['solutions'=>$solutions,'selectedCategory'=>$category]+app(PublicSiteController::class)->sharedViewData($r));} public function show(Request $r,string $solution,SolutionViewData $data):View{$payload=$data->published($solution);if(!$payload)abort(404);return view('solutions.show',['solution'=>$payload,'preview'=>false]+app(PublicSiteController::class)->sharedViewData($r));} }
