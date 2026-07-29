@@ -1,0 +1,13 @@
+<?php
+namespace App\Domain\PublicChrome;
+use App\Models\{NavigationItem,NavigationMenu}; use Illuminate\Support\Facades\DB; use Illuminate\Validation\ValidationException;
+class NavigationManager
+{
+ public const TOTAL_LIMIT=100; public const CHILD_LIMIT=20; public const TOP_LIMIT=12;
+ public function save(NavigationMenu $menu,array $data,?NavigationItem $item=null):NavigationItem
+ { $parent=isset($data['parent_id'])?NavigationItem::find($data['parent_id']):null; if($parent&&$parent->navigation_menu_id!==$menu->id)throw ValidationException::withMessages(['parent_id'=>'Parent must belong to this menu.']); if($item&&($parent?->id===$item->id||$this->descendantIds($item)->contains($parent?->id)))throw ValidationException::withMessages(['parent_id'=>'An item cannot use itself or a descendant as parent.']); $depth=$parent?$parent->depth+1:1;$max=$menu->location==='primary'?3:2;if($depth>$max)throw ValidationException::withMessages(['parent_id'=>'Maximum menu depth exceeded.']);if(!$item&&$menu->items()->count()>=self::TOTAL_LIMIT)throw ValidationException::withMessages(['label'=>'Menu item limit reached.']);if(!$item&&$menu->items()->where('parent_id',$parent?->id)->count()>=($parent?self::CHILD_LIMIT:self::TOP_LIMIT))throw ValidationException::withMessages(['parent_id'=>'Item limit for this level reached.']);$data['depth']=$depth;$data['navigation_menu_id']=$menu->id;return DB::transaction(fn()=>tap($item??new NavigationItem)->fill($data)->tap(fn($v)=>$v->save())); }
+ public function delete(NavigationItem $item):void {if($item->children()->exists())throw ValidationException::withMessages(['item'=>'Move or promote child items before deletion.']);$item->delete();}
+ public function deleteMenu(NavigationMenu $menu):void {if($menu->items()->exists())throw ValidationException::withMessages(['menu'=>'Remove menu items before deleting this menu.']);$menu->delete();}
+ public function move(NavigationItem $item,string $direction):void {DB::transaction(function()use($item,$direction){$operator=$direction==='up'?'<':'>';$order=$direction==='up'?'desc':'asc';$peer=NavigationItem::query()->where('navigation_menu_id',$item->navigation_menu_id)->where('parent_id',$item->parent_id)->where('display_order',$operator,$item->display_order)->orderBy('display_order',$order)->first();if($peer){[$item->display_order,$peer->display_order]=[$peer->display_order,$item->display_order];$peer->save();$item->save();}});}
+ private function descendantIds(NavigationItem $item){$ids=collect();$frontier=collect([$item->id]);for($i=0;$i<3&&$frontier->isNotEmpty();$i++){$frontier=NavigationItem::query()->whereIn('parent_id',$frontier)->pluck('id');$ids=$ids->merge($frontier);}return $ids;}
+}
