@@ -3,6 +3,7 @@
     :site-name="$siteName"
     :legal-name="$legalName"
     :navigation="$navigation"
+    :chrome="$chrome"
     :page-title="$pageTitle"
     :description="$description"
     :canonical="$canonical"

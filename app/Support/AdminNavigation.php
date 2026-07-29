@@ -9,7 +9,9 @@ class AdminNavigation
     {
         return [
             ['label' => 'Overview', 'items' => [['label' => 'Dashboard', 'route' => 'dashboard']]],
-            ['label' => 'Website', 'items' => self::disabled(['Homepage', 'Pages', 'Navigation', 'Header', 'Footer', 'Branding'])],
+            ['label' => 'Website', 'items' => array_merge(self::disabled(['Homepage', 'Pages']), [
+                ['label' => 'Navigation', 'route' => 'admin.navigation.index'], ['label' => 'Header', 'route' => 'admin.header.edit'], ['label' => 'Footer', 'route' => 'admin.footer.edit'], ['label' => 'Branding', 'route' => 'admin.branding.edit'],
+            ])],
             ['label' => 'Content', 'items' => self::disabled(['Solutions', 'Products', 'Industries', 'Capabilities', 'Work Process', 'Clients', 'Testimonials', 'Statistics'])],
             ['label' => 'Insights', 'items' => self::disabled(['Articles', 'Categories', 'Case Studies', 'FAQs'])],
             ['label' => 'Communication', 'items' => self::disabled(['Demo Requests', 'Contact Enquiries', 'Career Applications'])],

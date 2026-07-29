@@ -1,0 +1,8 @@
+@props(['items'=>[],'mobile'=>false,'level'=>1])
+<ul @class(['grid gap-1'=>$mobile,'min-w-64 rounded-lg border border-public-border bg-white p-2 shadow-xl'=>!$mobile])>
+@foreach($items as $item)<li @class(['rounded-lg bg-blue-50'=>$item['featured']])>
+@if($item['children'])<div x-data="{ open: false }" x-on:keydown.escape.stop="open=false; $refs.trigger.focus()" class="relative"><button x-ref="trigger" type="button" class="public-nav-link flex w-full items-center justify-between gap-2" x-on:click="open=!open" x-on:click.outside="open=false" :aria-expanded="open.toString()" aria-controls="{{ $item['id'] }}-submenu"><span>{{ $item['label'] }}</span><span aria-hidden="true">⌄</span></button><div id="{{ $item['id'] }}-submenu" x-cloak x-show="open" x-transition.opacity @class(['mt-1 ps-3'=>$mobile,'absolute start-0 top-full z-50 pt-2'=>$level===1&&!$mobile,'ps-4'=>$level>1&&!$mobile])><x-public.nav-items :items="$item['children']" :mobile="$mobile" :level="$level+1" /></div></div>
+@elseif($item['href'])<a href="{{ $item['href'] }}" target="{{ $item['target'] }}" @if($item['external']&&$item['target']==='_blank') rel="noopener noreferrer" @endif @if($item['route']&&request()->routeIs($item['route'])) aria-current="page" @endif class="public-nav-link block">{{ $item['label'] }} @if($item['badge'])<span class="text-xs">{{ $item['badge'] }}</span>@endif</a>
+@else<span class="public-nav-disabled block" aria-disabled="true">{{ $item['label'] }}<span class="sr-only"> — unavailable</span></span>@endif
+@if($item['description'])<p class="px-3 pb-2 text-xs text-public-muted">{{ $item['description'] }}</p>@endif
+</li>@endforeach</ul>
