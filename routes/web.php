@@ -4,11 +4,16 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\HomepageController;
 use App\Http\Controllers\Admin\PublicChromeController;
+use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\PageSectionController;
+use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\PublicSiteController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::get('/', PublicSiteController::class)->name('home');
+Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
 
 Route::middleware(['auth', 'administrator.active', 'installed'])->group(function () {
     Route::get('dashboard', DashboardController::class)->middleware('verified')->name('dashboard');
@@ -37,6 +42,15 @@ Route::middleware(['auth', 'administrator.active', 'installed'])->group(function
         Route::post('sections/{section}/items', 'storeItem')->name('items.store');
         Route::delete('sections/{section}/items/{item}', 'destroyItem')->name('items.destroy');
     });
+
+    Route::prefix('website/pages')->name('admin.pages.')->middleware('throttle:60,1')->group(function () {
+        Route::get('/', [PageController::class, 'index'])->name('index'); Route::get('create', [PageController::class, 'create'])->name('create'); Route::post('/', [PageController::class, 'store'])->name('store');
+        Route::get('{page}/edit', [PageController::class, 'edit'])->name('edit'); Route::match(['put', 'patch'], '{page}', [PageController::class, 'update'])->name('update');
+        Route::post('{page}/publish', [PageController::class, 'publish'])->name('publish'); Route::post('{page}/schedule', [PageController::class, 'schedule'])->name('schedule'); Route::post('{page}/unpublish', [PageController::class, 'unpublish'])->name('unpublish');
+        Route::post('{page}/archive', [PageController::class, 'archive'])->name('archive'); Route::post('{page}/restore', [PageController::class, 'restore'])->name('restore'); Route::post('{page}/duplicate', [PageController::class, 'duplicate'])->name('duplicate');
+        Route::post('{page}/move-up', [PageController::class, 'move'])->defaults('direction', 'up')->name('move-up'); Route::post('{page}/move-down', [PageController::class, 'move'])->defaults('direction', 'down')->name('move-down'); Route::get('{page}/preview', [PageController::class, 'preview'])->name('preview');
+        Route::post('{page}/sections', [PageSectionController::class, 'store'])->name('sections.store'); Route::match(['put', 'patch'], '{page}/sections/{section}', [PageSectionController::class, 'update'])->name('sections.update'); Route::delete('{page}/sections/{section}', [PageSectionController::class, 'destroy'])->name('sections.destroy'); Route::post('{page}/sections/{section}/move', [PageSectionController::class, 'move'])->name('sections.move');
+    });
 });
 
 Route::middleware(['auth', 'administrator.active'])->group(function () {
@@ -48,3 +62,5 @@ Route::middleware(['auth', 'administrator.active'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+Route::get('{slug}', PublicPageController::class)->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')->name('pages.show');

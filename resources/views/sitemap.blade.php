@@ -1,0 +1,1 @@
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>{{ $root }}/</loc></url>@foreach($pages as $page)<url><loc>{{ $root }}/{{ rawurlencode($page->slug) }}</loc><lastmod>{{ $page->updated_at->toAtomString() }}</lastmod></url>@endforeach</urlset>
