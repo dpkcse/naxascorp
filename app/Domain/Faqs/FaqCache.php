@@ -1,0 +1,2 @@
+<?php
+namespace App\Domain\Faqs; use App\Domain\Homepage\HomepageCache; use App\Models\HomepageItem; use Illuminate\Support\Facades\Cache; use Throwable; final class FaqCache { public static function version():int{try{return (int)Cache::rememberForever('public.faq.version',fn()=>hrtime(true));}catch(Throwable){return hrtime(true);}} public static function forget():void{try{Cache::put('public.faq.version',hrtime(true));if(HomepageItem::whereNotNull('faq_id')->exists()){HomepageCache::forget();}}catch(Throwable){}} }

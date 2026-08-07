@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ArticleController;
+use App\Http\Controllers\Admin\CaseStudyController;
+use App\Http\Controllers\Admin\CaseStudyChildController;
+use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\HomepageController;
 use App\Http\Controllers\Admin\PublicChromeController;
@@ -11,6 +15,9 @@ use App\Http\Controllers\Admin\SolutionController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductChildController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\PublicArticleController;
+use App\Http\Controllers\PublicCaseStudyController;
+use App\Http\Controllers\PublicFaqController;
 use App\Http\Controllers\PublicSolutionController;
 use App\Http\Controllers\PublicProductController;
 use App\Http\Controllers\PublicIndustryController;
@@ -34,6 +41,11 @@ use Livewire\Volt\Volt;
 
 Route::get('/', PublicSiteController::class)->name('home');
 Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('insights', [PublicArticleController::class, 'index'])->name('insights.index');
+Route::get('insights/{article}', [PublicArticleController::class, 'show'])->where('article', '[a-z0-9]+(?:-[a-z0-9]+)*')->name('insights.show');
+Route::get('case-studies', [PublicCaseStudyController::class, 'index'])->name('case-studies.index');
+Route::get('case-studies/{caseStudy}', [PublicCaseStudyController::class, 'show'])->where('caseStudy', '[a-z0-9]+(?:-[a-z0-9]+)*')->name('case-studies.show');
+Route::get('faq', PublicFaqController::class)->name('faq.index');
 Route::get('clients', [PublicClientController::class, 'index'])->name('clients.index');
 Route::get('clients/{client}', [PublicClientController::class, 'show'])->where('client', '[a-z0-9]+(?:-[a-z0-9]+)*')->name('clients.show');
 Route::get('testimonials', PublicTestimonialController::class)->name('testimonials.index');
@@ -119,6 +131,25 @@ Route::middleware(['auth', 'administrator.active', 'installed'])->group(function
         Route::post('{workProcess}/stages', [WorkProcessChildController::class, 'storeStage'])->name('stages.store'); Route::delete('{workProcess}/stages/{stage}', [WorkProcessChildController::class, 'destroyStage'])->name('stages.destroy'); Route::post('{workProcess}/stages/{stage}/move', [WorkProcessChildController::class, 'moveStage'])->name('stages.move'); Route::post('{workProcess}/stages/{stage}/deliverables', [WorkProcessChildController::class, 'storeDeliverable'])->name('deliverables.store'); Route::delete('{workProcess}/stages/{stage}/deliverables/{deliverable}', [WorkProcessChildController::class, 'destroyDeliverable'])->name('deliverables.destroy'); Route::post('{workProcess}/stages/{stage}/deliverables/{deliverable}/move', [WorkProcessChildController::class, 'moveDeliverable'])->name('deliverables.move');
     });
 
+
+
+    Route::prefix('content/articles')->name('admin.articles.')->middleware('throttle:60,1')->controller(ArticleController::class)->group(function () {
+        Route::get('/', 'index')->name('index'); Route::get('create', 'create')->name('create'); Route::post('/', 'store')->name('store'); Route::get('categories', 'categories')->name('categories.index'); Route::post('categories', 'storeArticleCategory')->name('categories.store');
+        Route::get('{article}/edit', 'edit')->name('edit'); Route::match(['put','patch'], '{article}', 'update')->name('update');
+        foreach (['publish','schedule','unpublish','archive','restore','duplicate'] as $action) { Route::post("{article}/{$action}", $action)->name($action); }
+        Route::post('{article}/move-up', 'move')->defaults('direction','up')->name('move-up'); Route::post('{article}/move-down', 'move')->defaults('direction','down')->name('move-down'); Route::get('{article}/preview', 'preview')->name('preview');
+    });
+    Route::prefix('content/case-studies')->name('admin.case-studies.')->middleware('throttle:60,1')->controller(CaseStudyController::class)->group(function () {
+        Route::get('/', 'index')->name('index'); Route::get('create', 'create')->name('create'); Route::post('/', 'store')->name('store'); Route::get('{caseStudy}/edit', 'edit')->name('edit'); Route::match(['put','patch'], '{caseStudy}', 'update')->name('update');
+        foreach (['publish','schedule','unpublish','archive','restore','duplicate'] as $action) { Route::post("{caseStudy}/{$action}", $action)->name($action); }
+        Route::post('{caseStudy}/{type}', [CaseStudyChildController::class, 'store'])->where('type','metrics|highlights')->name('children.store'); Route::delete('{caseStudy}/{type}/{child}', [CaseStudyChildController::class, 'destroy'])->where('type','metrics|highlights')->name('children.destroy');
+        Route::post('{caseStudy}/move-up', 'move')->defaults('direction','up')->name('move-up'); Route::post('{caseStudy}/move-down', 'move')->defaults('direction','down')->name('move-down'); Route::get('{caseStudy}/preview', 'preview')->name('preview');
+    });
+    Route::prefix('content/faqs')->name('admin.faqs.')->middleware('throttle:60,1')->controller(FaqController::class)->group(function () {
+        Route::get('/', 'index')->name('index'); Route::get('create', 'create')->name('create'); Route::post('/', 'store')->name('store'); Route::get('groups', 'groups')->name('groups.index'); Route::post('groups', 'storeFaqGroup')->name('groups.store'); Route::get('{faq}/edit', 'edit')->name('edit'); Route::match(['put','patch'], '{faq}', 'update')->name('update');
+        foreach (['publish','schedule','unpublish','archive','restore','duplicate'] as $action) { Route::post("{faq}/{$action}", $action)->name($action); }
+        Route::post('{faq}/move-up', 'move')->defaults('direction','up')->name('move-up'); Route::post('{faq}/move-down', 'move')->defaults('direction','down')->name('move-down'); Route::get('{faq}/preview', 'preview')->name('preview');
+    });
 
     foreach ([
         'clients' => ClientController::class,
