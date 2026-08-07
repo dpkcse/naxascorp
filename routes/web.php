@@ -36,6 +36,9 @@ use App\Http\Controllers\PublicTestimonialController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\StatisticController;
+use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\MediaCollectionController;
+use App\Http\Controllers\Admin\MediaUsageController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -64,6 +67,22 @@ Route::middleware(['auth', 'administrator.active', 'installed'])->group(function
     Route::get('dashboard', DashboardController::class)->middleware('verified')->name('dashboard');
     Route::get('system/license', [LicenseController::class, 'status'])->name('license.status');
     Route::get('system/license/diagnostics', [LicenseController::class, 'diagnostics'])->name('license.diagnostics');
+
+    Route::prefix('content/media')->name('admin.media.')->group(function () {
+        Route::get('/', [MediaController::class, 'index'])->name('index');
+        Route::post('/', [MediaController::class, 'store'])->middleware('throttle:10,1')->name('store');
+        Route::post('collections', [MediaCollectionController::class, 'store'])->middleware('throttle:30,1')->name('collections.store');
+        Route::patch('collections/{collection}', [MediaCollectionController::class, 'update'])->middleware('throttle:30,1')->name('collections.update');
+        Route::delete('collections/{collection}', [MediaCollectionController::class, 'destroy'])->middleware('throttle:30,1')->name('collections.destroy');
+        Route::post('usages/{type}/{id}', [MediaUsageController::class, 'store'])->middleware('throttle:30,1')->name('usages.store');
+        Route::delete('usages/{type}/{id}/{mediaUsage}', [MediaUsageController::class, 'destroy'])->middleware('throttle:30,1')->name('usages.destroy');
+        Route::get('{mediaAsset}', [MediaController::class, 'show'])->name('show');
+        Route::patch('{mediaAsset}', [MediaController::class, 'update'])->middleware('throttle:30,1')->name('update');
+        Route::post('{mediaAsset}/replace', [MediaController::class, 'replace'])->middleware('throttle:10,1')->name('replace');
+        Route::post('{mediaAsset}/archive', [MediaController::class, 'archive'])->middleware('throttle:30,1')->name('archive');
+        Route::post('{mediaAsset}/restore', [MediaController::class, 'restore'])->middleware('throttle:30,1')->name('restore');
+        Route::delete('{mediaAsset}', [MediaController::class, 'destroy'])->middleware('throttle:10,1')->name('destroy');
+    });
 
     Route::prefix('website')->name('admin.')->middleware('throttle:60,1')->controller(PublicChromeController::class)->group(function () {
         Route::get('branding', 'branding')->name('branding.edit'); Route::put('branding', 'saveBranding')->name('branding.update');
