@@ -12,7 +12,7 @@ class AdminNavigation
             ['label' => 'Website', 'items' => [['label' => 'Homepage', 'route' => 'admin.homepage.edit'], ['label' => 'Pages', 'route' => 'admin.pages.index'],
                 ['label' => 'Navigation', 'route' => 'admin.navigation.index'], ['label' => 'Header', 'route' => 'admin.header.edit'], ['label' => 'Footer', 'route' => 'admin.footer.edit'], ['label' => 'Branding', 'route' => 'admin.branding.edit'],
             ]],
-            ['label' => 'Content', 'items' => array_merge([['label' => 'Solutions', 'route' => 'admin.solutions.index'], ['label' => 'Products', 'route' => 'admin.products.index'], ['label' => 'Industries', 'route' => 'admin.industries.index']], self::disabled(['Capabilities', 'Work Process', 'Clients', 'Testimonials', 'Statistics']))],
+            ['label' => 'Content', 'items' => array_merge([['label' => 'Solutions', 'route' => 'admin.solutions.index'], ['label' => 'Products', 'route' => 'admin.products.index'], ['label' => 'Industries', 'route' => 'admin.industries.index'], ['label' => 'Capabilities', 'route' => 'admin.capabilities.index'], ['label' => 'Work Process', 'route' => 'admin.work-processes.index']], self::disabled(['Clients', 'Testimonials', 'Statistics']))],
             ['label' => 'Insights', 'items' => self::disabled(['Articles', 'Categories', 'Case Studies', 'FAQs'])],
             ['label' => 'Communication', 'items' => self::disabled(['Demo Requests', 'Contact Enquiries', 'Career Applications'])],
             ['label' => 'Media', 'items' => self::disabled(['Media Library'])],

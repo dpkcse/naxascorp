@@ -1,0 +1,45 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('capability_categories', function (Blueprint $table) {
+            $table->id(); $table->string('name', 120); $table->string('slug', 120)->unique(); $table->text('description')->nullable(); $table->unsignedSmallInteger('display_order')->default(1); $table->boolean('is_active')->default(true)->index(); $table->timestamps();
+        });
+        Schema::create('capabilities', function (Blueprint $table) {
+            $table->id(); $table->foreignId('capability_category_id')->nullable()->constrained()->restrictOnDelete();
+            $table->string('title', 160); $table->string('slug', 160)->unique(); $table->string('eyebrow', 120)->nullable(); $table->string('short_description', 500); $table->text('overview')->nullable(); $table->string('icon', 40)->nullable(); $table->string('featured_image_path')->nullable(); $table->string('featured_image_alt', 160)->nullable(); $table->string('template', 30)->default('standard'); $table->string('hero_style', 30)->default('standard'); $table->string('status', 20)->default('draft')->index(); $table->boolean('is_featured')->default(false)->index(); $table->unsignedSmallInteger('display_order')->default(1); $table->timestamp('published_at')->nullable()->index(); $table->timestamp('scheduled_for')->nullable()->index(); $table->timestamp('archived_at')->nullable()->index();
+            foreach (['primary', 'secondary'] as $cta) { $table->string($cta.'_cta_label', 80)->nullable(); $table->string($cta.'_cta_url', 2048)->nullable(); }
+            $table->string('meta_title', 70)->nullable(); $table->string('meta_description', 170)->nullable(); $table->string('canonical_url', 2048)->nullable(); $table->string('og_title', 70)->nullable(); $table->string('og_description', 200)->nullable(); $table->string('og_image_path')->nullable(); $table->boolean('robots_index')->default(true); $table->boolean('robots_follow')->default(true); $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete(); $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete(); $table->timestamps(); $table->index(['capability_category_id', 'display_order']);
+        });
+        foreach (['capability_highlights', 'capability_benefits'] as $name) { Schema::create($name, function (Blueprint $table) { $table->id(); $table->foreignId('capability_id')->constrained()->cascadeOnDelete(); $table->string('title', 160); $table->text('description')->nullable(); $table->string('icon', 40)->nullable(); $table->unsignedSmallInteger('display_order')->default(1); $table->boolean('is_active')->default(true); $table->timestamps(); $table->index(['capability_id', 'display_order']); }); }
+        Schema::create('capability_facts', function (Blueprint $table) { $table->id(); $table->foreignId('capability_id')->constrained()->cascadeOnDelete(); $table->string('label', 160); $table->string('value', 500); $table->text('description')->nullable(); $table->unsignedSmallInteger('display_order')->default(1); $table->boolean('is_active')->default(true); $table->timestamps(); $table->index(['capability_id', 'display_order']); });
+        foreach ([['capability_solution_relations', 'solution_id', 'solutions'], ['capability_product_relations', 'product_id', 'products'], ['capability_industry_relations', 'industry_id', 'industries'], ['capability_page_relations', 'page_id', 'pages']] as [$name, $key, $target]) { Schema::create($name, function (Blueprint $table) use ($key, $target) { $table->id(); $table->foreignId('capability_id')->constrained()->cascadeOnDelete(); $table->foreignId($key)->constrained($target)->restrictOnDelete(); $table->unsignedSmallInteger('display_order')->default(1); $table->timestamps(); $table->unique(['capability_id', $key]); }); }
+        Schema::create('work_processes', function (Blueprint $table) {
+            $table->id(); $table->string('title', 160); $table->string('slug', 160)->unique(); $table->string('eyebrow', 120)->nullable(); $table->string('short_description', 500); $table->text('overview')->nullable(); $table->string('icon', 40)->nullable(); $table->string('featured_image_path')->nullable(); $table->string('featured_image_alt', 160)->nullable(); $table->string('template', 30)->default('standard'); $table->string('hero_style', 30)->default('standard'); $table->string('status', 20)->default('draft')->index(); $table->boolean('is_featured')->default(false)->index(); $table->unsignedSmallInteger('display_order')->default(1); $table->timestamp('published_at')->nullable()->index(); $table->timestamp('scheduled_for')->nullable()->index(); $table->timestamp('archived_at')->nullable()->index();
+            foreach (['primary', 'secondary'] as $cta) { $table->string($cta.'_cta_label', 80)->nullable(); $table->string($cta.'_cta_url', 2048)->nullable(); }
+            $table->string('meta_title', 70)->nullable(); $table->string('meta_description', 170)->nullable(); $table->string('canonical_url', 2048)->nullable(); $table->string('og_title', 70)->nullable(); $table->string('og_description', 200)->nullable(); $table->string('og_image_path')->nullable(); $table->boolean('robots_index')->default(true); $table->boolean('robots_follow')->default(true); $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete(); $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete(); $table->timestamps(); $table->index(['display_order', 'status']);
+        });
+        Schema::create('work_process_stages', function (Blueprint $table) { $table->id(); $table->foreignId('work_process_id')->constrained()->cascadeOnDelete(); $table->string('title', 160); $table->text('description'); $table->string('icon', 40)->nullable(); $table->string('duration_text', 160)->nullable(); $table->unsignedSmallInteger('display_order')->default(1); $table->boolean('is_active')->default(true); $table->timestamps(); $table->index(['work_process_id', 'display_order']); });
+        Schema::create('work_process_deliverables', function (Blueprint $table) { $table->id(); $table->foreignId('work_process_stage_id')->constrained()->cascadeOnDelete(); $table->string('title', 160); $table->text('description')->nullable(); $table->unsignedSmallInteger('display_order')->default(1); $table->boolean('is_active')->default(true); $table->timestamps(); $table->index(['work_process_stage_id', 'display_order']); });
+        foreach ([['work_process_solution_relations', 'solution_id', 'solutions'], ['work_process_product_relations', 'product_id', 'products'], ['work_process_industry_relations', 'industry_id', 'industries'], ['work_process_page_relations', 'page_id', 'pages']] as [$name, $key, $target]) { Schema::create($name, function (Blueprint $table) use ($key, $target) { $table->id(); $table->foreignId('work_process_id')->constrained()->cascadeOnDelete(); $table->foreignId($key)->constrained($target)->restrictOnDelete(); $table->unsignedSmallInteger('display_order')->default(1); $table->timestamps(); $table->unique(['work_process_id', $key]); }); }
+        Schema::table('homepage_items', fn (Blueprint $table) => $table->foreignId('capability_id')->nullable()->constrained()->restrictOnDelete());
+        Schema::table('homepage_sections', fn (Blueprint $table) => $table->foreignId('work_process_id')->nullable()->constrained()->restrictOnDelete());
+        Schema::table('industry_needs', fn (Blueprint $table) => $table->foreignId('capability_id')->nullable()->constrained()->restrictOnDelete());
+        Schema::table('navigation_items', function (Blueprint $table) { $table->foreignId('capability_id')->nullable()->constrained()->restrictOnDelete(); $table->foreignId('work_process_id')->nullable()->constrained()->restrictOnDelete(); $table->index(['link_type', 'capability_id']); $table->index(['link_type', 'work_process_id']); });
+    }
+
+    public function down(): void
+    {
+        Schema::table('navigation_items', function (Blueprint $table) { $table->dropConstrainedForeignId('work_process_id'); $table->dropConstrainedForeignId('capability_id'); });
+        Schema::table('industry_needs', fn (Blueprint $table) => $table->dropConstrainedForeignId('capability_id'));
+        Schema::table('homepage_sections', fn (Blueprint $table) => $table->dropConstrainedForeignId('work_process_id'));
+        Schema::table('homepage_items', fn (Blueprint $table) => $table->dropConstrainedForeignId('capability_id'));
+        foreach (['work_process_page_relations', 'work_process_industry_relations', 'work_process_product_relations', 'work_process_solution_relations', 'work_process_deliverables', 'work_process_stages', 'work_processes', 'capability_page_relations', 'capability_industry_relations', 'capability_product_relations', 'capability_solution_relations', 'capability_facts', 'capability_benefits', 'capability_highlights', 'capabilities', 'capability_categories'] as $table) { Schema::dropIfExists($table); }
+    }
+};

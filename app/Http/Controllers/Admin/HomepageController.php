@@ -10,6 +10,8 @@ use App\Domain\PublicChrome\PublicAssetPath;
 use App\Domain\PublicChrome\PublicLink;
 use App\Http\Controllers\Controller;
 use App\Models\HomepageItem;
+use App\Models\Capability;
+use App\Models\WorkProcess;
 use App\Models\Industry;
 use App\Models\HomepageSection;
 use App\Models\HomepageSetting;
@@ -41,9 +43,12 @@ class HomepageController extends Controller
 
         $industries = Industry::query()->whereNull('archived_at')->orderBy('title')->get(['id', 'title', 'status']);
 
+        $capabilities = Capability::query()->whereNull('archived_at')->orderBy('title')->get(['id','title','status']);
+        $workProcesses = WorkProcess::query()->whereNull('archived_at')->orderBy('title')->get(['id','title','status']);
+
         $solutions = Solution::query()->whereNull('archived_at')->orderBy('title')->get(['id', 'title', 'status']);
 
-        return view('admin.homepage.section', compact('definition', 'record', 'products', 'solutions', 'industries'));
+        return view('admin.homepage.section', compact('definition', 'record', 'products', 'solutions', 'industries', 'capabilities', 'workProcesses'));
     }
 
     public function saveSettings(Request $request): RedirectResponse
@@ -79,7 +84,7 @@ class HomepageController extends Controller
     {
         $this->guardSection($section);
         $data = $request->validate([
-            'is_enabled' => ['sometimes', 'boolean'], 'eyebrow' => ['nullable', 'string', 'max:120'], 'heading' => ['nullable', 'string', 'max:180'],
+            'work_process_id' => [$section->section_key === 'process' ? 'nullable' : 'prohibited', Rule::exists(WorkProcess::class, 'id')->whereNull('archived_at')], 'is_enabled' => ['sometimes', 'boolean'], 'eyebrow' => ['nullable', 'string', 'max:120'], 'heading' => ['nullable', 'string', 'max:180'],
             'description' => ['nullable', 'string', 'max:2000'], 'secondary_description' => ['nullable', 'string', 'max:2000'],
             'image_path' => ['nullable', 'string', 'max:255'], 'image_alt' => ['nullable', 'string', 'max:180'],
             'primary_cta_label' => ['nullable', 'string', 'max:80'], 'primary_cta_url' => ['nullable', 'string', 'max:2048'],
@@ -149,6 +154,7 @@ class HomepageController extends Controller
         $definition = HomepageSectionRegistry::all()[$section->section_key];
         $type = $definition['item_type'];
         return [
+            'capability_id' => [$section->section_key === 'capabilities' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Capability::class, 'id')->whereNull('archived_at')],
             'industry_id' => [$section->section_key === 'industries' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Industry::class, 'id')->whereNull('archived_at')],
             'product_id' => [$section->section_key === 'featured_products' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Product::class, 'id')->whereNull('archived_at')],
             'solution_id' => [$section->section_key === 'featured_solutions' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Solution::class, 'id')->whereNull('archived_at')],
