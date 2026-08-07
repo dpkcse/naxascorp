@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('label', 120); $table->string('link_type', 20); $table->string('route_name', 120)->nullable(); $table->string('url', 2048)->nullable(); $table->string('target', 10)->default('_self');
             $table->string('icon', 40)->nullable(); $table->string('description', 240)->nullable(); $table->string('badge_text', 40)->nullable(); $table->unsignedSmallInteger('display_order')->default(0); $table->unsignedTinyInteger('depth')->default(1);
             $table->boolean('is_active')->default(true)->index(); $table->boolean('is_featured')->default(false); $table->boolean('opens_mega_menu')->default(false); $table->timestamps();
-            $table->index(['navigation_menu_id', 'parent_id', 'display_order']);
+            $table->index(['navigation_menu_id', 'parent_id', 'display_order'], 'nav_items_menu_parent_order_idx');
         });
         Schema::create('footer_settings', function (Blueprint $table) {
             $table->id(); $table->unsignedTinyInteger('singleton_key')->default(1)->unique(); $table->string('short_description', 500)->nullable();
