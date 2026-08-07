@@ -1,0 +1,2 @@
+<?php
+namespace App\Domain\Statistics; use App\Domain\Homepage\HomepageCache; use App\Models\HomepageItem; use Illuminate\Support\Facades\Cache; use Throwable; final class StatisticCache { public static function version():int{try{return (int)Cache::rememberForever('public.statistics.version',fn()=>hrtime(true));}catch(Throwable){return hrtime(true);}} public static function forget(int $id):void{try{Cache::put('public.statistics.version',hrtime(true));if(HomepageItem::where('statistic_id',$id)->exists())HomepageCache::forget();}catch(Throwable){}} }

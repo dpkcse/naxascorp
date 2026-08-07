@@ -1,0 +1,2 @@
+<?php
+namespace Database\Factories; use App\Models\Statistic; use Illuminate\Database\Eloquent\Factories\Factory; class StatisticFactory extends Factory { protected $model=Statistic::class; public function definition():array{return ['label'=>fake()->words(2,true),'value'=>(string)fake()->numberBetween(1,999),'statistic_group'=>'other','status'=>'draft','is_featured'=>false,'display_order'=>1];} public function published():static{return $this->state(fn()=>['status'=>'published','published_at'=>now(),'archived_at'=>null]);} }
