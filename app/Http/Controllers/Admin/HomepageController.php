@@ -10,6 +10,8 @@ use App\Domain\PublicChrome\PublicAssetPath;
 use App\Domain\PublicChrome\PublicLink;
 use App\Http\Controllers\Controller;
 use App\Models\HomepageItem;
+use App\Models\Article;
+use App\Models\Faq;
 use App\Models\Client;
 use App\Models\Testimonial;
 use App\Models\Statistic;
@@ -161,6 +163,8 @@ class HomepageController extends Controller
         $definition = HomepageSectionRegistry::all()[$section->section_key];
         $type = $definition['item_type'];
         return [
+            'article_id' => [$section->section_key === 'insights' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Article::class, 'id')->whereNull('archived_at')],
+            'faq_id' => [$section->section_key === 'faq' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Faq::class, 'id')->whereNull('archived_at')],
             'client_id' => [$section->section_key === 'clients' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Client::class, 'id')->whereNull('archived_at')],
             'testimonial_id' => [$section->section_key === 'testimonials' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Testimonial::class, 'id')->whereNull('archived_at')],
             'statistic_id' => [$section->section_key === 'statistics' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Statistic::class, 'id')->whereNull('archived_at')],

@@ -1,0 +1,2 @@
+<?php
+namespace Database\Factories; use App\Models\Faq; use Illuminate\Database\Eloquent\Factories\Factory; class FaqFactory extends Factory { protected $model=Faq::class; public function definition():array{return ['question'=>fake()->sentence().'?', 'answer'=>fake()->paragraph(),'status'=>'draft','is_featured'=>false,'display_order'=>1];} public function published():static{return $this->state(fn()=>['status'=>'published','published_at'=>now()->subMinute()]);} }
