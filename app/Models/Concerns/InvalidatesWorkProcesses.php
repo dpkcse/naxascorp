@@ -1,0 +1,2 @@
+<?php
+namespace App\Models\Concerns; use App\Domain\WorkProcesses\WorkProcessCache; trait InvalidatesWorkProcesses { protected static function bootInvalidatesWorkProcesses():void { static::saved(function($model){$id=$model->work_process_id??$model->stage?->work_process_id??$model->id; WorkProcessCache::forget((int)$id);}); static::deleted(function($model){$id=$model->work_process_id??$model->stage?->work_process_id??$model->id; WorkProcessCache::forget((int)$id);}); } }

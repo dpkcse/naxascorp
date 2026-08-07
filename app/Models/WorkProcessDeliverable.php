@@ -1,0 +1,2 @@
+<?php
+namespace App\Models; use App\Models\Concerns\InvalidatesWorkProcesses; use Illuminate\Database\Eloquent\Model; use Illuminate\Database\Eloquent\Relations\BelongsTo; class WorkProcessDeliverable extends Model { use InvalidatesWorkProcesses; protected $fillable=['work_process_stage_id','title','description','display_order','is_active']; protected function casts():array{return ['is_active'=>'boolean'];} public function stage():BelongsTo{return $this->belongsTo(WorkProcessStage::class,'work_process_stage_id');} }

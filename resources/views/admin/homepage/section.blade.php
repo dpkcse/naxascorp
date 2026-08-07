@@ -3,6 +3,7 @@
     @include('admin.public-chrome._messages')
     <div class="mt-6 grid gap-6 xl:grid-cols-2">
         <x-admin.card><form method="POST" action="{{ route('admin.homepage.sections.update', $record) }}" class="grid gap-5">@csrf @method('PUT')<x-admin.validation-summary />
+            @if($record->section_key === 'process')<x-admin.select name="work_process_id" label="Canonical work process (optional)" :options="[''=>'Keep homepage-specific steps']+$workProcesses->mapWithKeys(fn($process)=>[$process->id=>$process->title.' ('.ucfirst($process->status).')'])->all()" :selected="$record->work_process_id" />@endif
             <x-admin.checkbox name="is_enabled" label="Enable this section" :checked="old('is_enabled', $record->is_enabled)" />
             <div class="grid gap-5 sm:grid-cols-2"><x-admin.form-input name="eyebrow" label="Eyebrow" :value="old('eyebrow', $record->eyebrow)" /><x-admin.form-input name="heading" label="Heading" :value="old('heading', $record->heading)" /></div>
             <x-admin.textarea name="description" label="Description">{{ old('description', $record->description) }}</x-admin.textarea><x-admin.textarea name="secondary_description" label="Secondary description">{{ old('secondary_description', $record->secondary_description) }}</x-admin.textarea>
@@ -14,6 +15,7 @@
         </form></x-admin.card>
         @if($definition['item_type'])<x-admin.card><h2 class="text-lg font-bold">Add {{ strtolower($definition['label']) }} item</h2><p class="mt-1 text-sm text-slate-600">Maximum {{ $definition['maximum'] }}. All content is plain text; paths must reference local assets.</p><form method="POST" action="{{ route('admin.homepage.items.store', $record) }}" class="mt-5 grid gap-4">@csrf
             @if($definition['secondary_item_type'])<x-admin.select name="item_type" label="Item type" :options="[$definition['item_type'] => 'Hero slide', $definition['secondary_item_type'] => 'Hero tab']" />@endif
+            @if($record->section_key === 'capabilities')<x-admin.select name="capability_id" label="Canonical capability (optional)" :options="[''=>'Keep homepage-only preview']+$capabilities->mapWithKeys(fn($capability)=>[$capability->id=>$capability->title.' ('.ucfirst($capability->status).')'])->all()" />@endif
             @if($record->section_key === 'industries')<x-admin.select name="industry_id" label="Canonical industry (optional)" :options="[''=>'Keep homepage-only preview']+$industries->mapWithKeys(fn($industry)=>[$industry->id=>$industry->title.' ('.ucfirst($industry->status).')'])->all()" />@endif
             @if($record->section_key === 'featured_products')<x-admin.select name="product_id" label="Canonical product (optional)" :options="[''=>'Keep homepage-only preview']+$products->mapWithKeys(fn($product)=>[$product->id=>$product->title.' ('.ucfirst($product->status).')'])->all()" />@endif
             @if($record->section_key === 'featured_solutions')<x-admin.select name="solution_id" label="Canonical solution (optional)" :options="[''=>'Keep homepage-only preview']+$solutions->mapWithKeys(fn($solution)=>[$solution->id=>$solution->title.' ('.ucfirst($solution->status).')'])->all()" />@endif

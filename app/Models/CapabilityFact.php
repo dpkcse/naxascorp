@@ -1,0 +1,2 @@
+<?php
+namespace App\Models; use App\Models\Concerns\InvalidatesCapabilities; use Illuminate\Database\Eloquent\Model; use Illuminate\Database\Eloquent\Relations\BelongsTo; class CapabilityFact extends Model { use InvalidatesCapabilities; protected $fillable=['capability_id','label','value','description','display_order','is_active']; protected function casts():array{return ['is_active'=>'boolean'];} public function capability():BelongsTo{return $this->belongsTo(Capability::class);} }
