@@ -1,0 +1,2 @@
+<?php
+namespace App\Models;use App\Models\Concerns\InvalidatesIndustries;use Illuminate\Database\Eloquent\Model;use Illuminate\Database\Eloquent\Relations\BelongsTo;class IndustryChallenge extends Model{use InvalidatesIndustries;protected $table='industry_challenges';protected $fillable=['industry_id','title','description','icon','display_order','is_active'];protected function casts():array{return ['is_active'=>'boolean'];}public function industry():BelongsTo{return $this->belongsTo(Industry::class);}}

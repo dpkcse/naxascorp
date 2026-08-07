@@ -1,0 +1,4 @@
+<?php
+namespace App\Http\Controllers;
+use App\Domain\Industries\{IndustryIndexViewData,IndustryViewData}; use Illuminate\Contracts\View\View; use Illuminate\Http\Request;
+class PublicIndustryController extends Controller { public function index(Request $r,IndustryIndexViewData $data):View{$category=$r->validate(['category'=>['nullable','regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],'page'=>['nullable','integer','min:1']])['category']??null;$industries=$data->get($category,max(1,$r->integer('page',1)));if($industries['invalid'])abort(404);return view('industries.index',['industries'=>$industries,'selectedCategory'=>$category]+app(PublicSiteController::class)->sharedViewData($r));} public function show(Request $r,string $industry,IndustryViewData $data):View{$payload=$data->published($industry);if(!$payload)abort(404);return view('industries.show',['industry'=>$payload,'preview'=>false]+app(PublicSiteController::class)->sharedViewData($r));} }
