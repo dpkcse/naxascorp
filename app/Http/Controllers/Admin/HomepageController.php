@@ -10,6 +10,7 @@ use App\Domain\PublicChrome\PublicAssetPath;
 use App\Domain\PublicChrome\PublicLink;
 use App\Http\Controllers\Controller;
 use App\Models\HomepageItem;
+use App\Models\Industry;
 use App\Models\HomepageSection;
 use App\Models\HomepageSetting;
 use App\Models\Product;
@@ -38,9 +39,11 @@ class HomepageController extends Controller
 
         $products = Product::query()->whereNull('archived_at')->orderBy('title')->get(['id', 'title', 'status']);
 
+        $industries = Industry::query()->whereNull('archived_at')->orderBy('title')->get(['id', 'title', 'status']);
+
         $solutions = Solution::query()->whereNull('archived_at')->orderBy('title')->get(['id', 'title', 'status']);
 
-        return view('admin.homepage.section', compact('definition', 'record', 'products', 'solutions'));
+        return view('admin.homepage.section', compact('definition', 'record', 'products', 'solutions', 'industries'));
     }
 
     public function saveSettings(Request $request): RedirectResponse
@@ -146,6 +149,7 @@ class HomepageController extends Controller
         $definition = HomepageSectionRegistry::all()[$section->section_key];
         $type = $definition['item_type'];
         return [
+            'industry_id' => [$section->section_key === 'industries' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Industry::class, 'id')->whereNull('archived_at')],
             'product_id' => [$section->section_key === 'featured_products' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Product::class, 'id')->whereNull('archived_at')],
             'solution_id' => [$section->section_key === 'featured_solutions' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Solution::class, 'id')->whereNull('archived_at')],
             'item_type' => ['nullable', Rule::in(array_filter([$type, $definition['secondary_item_type']]))], 'title' => ['required', 'string', 'max:180'], 'eyebrow' => ['nullable', 'string', 'max:120'],
