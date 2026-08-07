@@ -58,7 +58,7 @@ final class HomepageViewData
         $sections = HomepageSection::query()
             ->when(! $preview, fn ($query) => $query->where('is_enabled', true))
             ->orderBy('display_order')->orderBy('id')
-            ->with(['workProcess.stages.deliverables', 'items' => fn ($query) => $query->with(['solution','product','industry','capability','client','testimonial.client','statistic'])->where('is_active', true)->orderBy('display_order')->orderBy('id')->limit(24)])
+            ->with(['workProcess.stages.deliverables', 'items' => fn ($query) => $query->with(['article','faq','solution','product','industry','capability','client','testimonial.client','statistic'])->where('is_active', true)->orderBy('display_order')->orderBy('id')->limit(24)])
             ->limit(count($registry))->get()
             ->filter(fn (HomepageSection $section): bool => isset($registry[$section->section_key]))
             ->map(function (HomepageSection $section) use ($registry): array {
@@ -88,7 +88,7 @@ final class HomepageViewData
                         'canonical_client' => $item->client?->isPubliclyVisible() ? ['name'=>$item->client->name,'logo_path'=>PublicAssetPath::isSafe($item->client->logo_path)?$item->client->logo_path:null,'logo_alt'=>$item->client->logo_alt,'website_url'=>PublicLink::isSafeUrl($item->client->website_url)?$item->client->website_url:null,'url'=>route('clients.show',$item->client->slug)] : null,
                         'canonical_testimonial' => $item->testimonial?->isPubliclyVisible() ? ['person_name'=>$item->testimonial->person_name,'designation'=>$item->testimonial->designation,'quote'=>$item->testimonial->quote,'image_path'=>PublicAssetPath::isSafe($item->testimonial->image_path)?$item->testimonial->image_path:null,'image_alt'=>$item->testimonial->image_alt] : null,
                         'canonical_statistic' => $item->statistic?->isPubliclyVisible() ? ['label'=>$item->statistic->label,'description'=>$item->statistic->description,'source_note'=>$item->statistic->source_note,'as_of_date'=>$item->statistic->as_of_date?->toDateString()] : null,
-                        'published_on' => $item->published_on?->toDateString(),
+                        'canonical_article' => $item->article?->isPubliclyVisible() ? ['url'=>route('insights.show',$item->article->slug)] : null, 'published_on' => $item->article?->isPubliclyVisible() ? ($item->article->published_at?:$item->article->scheduled_for)?->toDateString() : $item->published_on?->toDateString(),
                     ])->values()->all(),
                 ];
             })->values()->all();
@@ -102,7 +102,7 @@ final class HomepageViewData
 
     private function itemTitle($item): string
     {
-        foreach (['client' => 'name', 'testimonial' => 'person_name', 'statistic' => 'label', 'capability' => 'title', 'industry' => 'title', 'product' => 'title', 'solution' => 'title'] as $relation => $field) {
+        foreach (['article' => 'title', 'faq' => 'question', 'client' => 'name', 'testimonial' => 'person_name', 'statistic' => 'label', 'capability' => 'title', 'industry' => 'title', 'product' => 'title', 'solution' => 'title'] as $relation => $field) {
             if ($item->{$relation}?->isPubliclyVisible()) { return (string) $item->{$relation}->{$field}; }
         }
         return (string) $item->title;
@@ -110,7 +110,7 @@ final class HomepageViewData
 
     private function itemDescription($item): ?string
     {
-        foreach (['client' => 'short_description', 'testimonial' => 'quote', 'statistic' => 'description', 'capability' => 'short_description', 'industry' => 'short_description', 'product' => 'short_description', 'solution' => 'short_description'] as $relation => $field) {
+        foreach (['article' => 'excerpt', 'faq' => 'answer', 'client' => 'short_description', 'testimonial' => 'quote', 'statistic' => 'description', 'capability' => 'short_description', 'industry' => 'short_description', 'product' => 'short_description', 'solution' => 'short_description'] as $relation => $field) {
             if ($item->{$relation}?->isPubliclyVisible()) { return $item->{$relation}->{$field}; }
         }
         return $item->description;
@@ -118,7 +118,7 @@ final class HomepageViewData
 
     private function itemImage($item): ?string
     {
-        foreach (['client' => 'logo_path', 'testimonial' => 'image_path', 'product' => 'featured_image_path', 'solution' => 'featured_image_path'] as $relation => $field) {
+        foreach (['article' => 'featured_image_path', 'client' => 'logo_path', 'testimonial' => 'image_path', 'product' => 'featured_image_path', 'solution' => 'featured_image_path'] as $relation => $field) {
             if ($item->{$relation}?->isPubliclyVisible() && PublicAssetPath::isSafe($item->{$relation}->{$field})) { return $item->{$relation}->{$field}; }
         }
         return PublicAssetPath::isSafe($item->image_path) ? $item->image_path : null;
