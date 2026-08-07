@@ -24,11 +24,19 @@ use App\Http\Controllers\PublicCapabilityController;
 use App\Http\Controllers\PublicWorkProcessController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\PublicClientController;
+use App\Http\Controllers\PublicTestimonialController;
+use App\Http\Controllers\Admin\ClientController;
+use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\StatisticController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::get('/', PublicSiteController::class)->name('home');
 Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('clients', [PublicClientController::class, 'index'])->name('clients.index');
+Route::get('clients/{client}', [PublicClientController::class, 'show'])->where('client', '[a-z0-9]+(?:-[a-z0-9]+)*')->name('clients.show');
+Route::get('testimonials', PublicTestimonialController::class)->name('testimonials.index');
 Route::get('capabilities', [PublicCapabilityController::class, 'index'])->name('capabilities.index');
 Route::get('capabilities/{capability}', [PublicCapabilityController::class, 'show'])->where('capability', '[a-z0-9]+(?:-[a-z0-9]+)*')->name('capabilities.show');
 Route::get('work-processes', [PublicWorkProcessController::class, 'index'])->name('work-processes.index');
@@ -110,6 +118,22 @@ Route::middleware(['auth', 'administrator.active', 'installed'])->group(function
         Route::get('{workProcess}/edit', [WorkProcessController::class, 'edit'])->name('edit'); Route::match(['put','patch'], '{workProcess}', [WorkProcessController::class, 'update'])->name('update'); Route::post('{workProcess}/publish', [WorkProcessController::class, 'publish'])->name('publish'); Route::post('{workProcess}/schedule', [WorkProcessController::class, 'schedule'])->name('schedule'); Route::post('{workProcess}/unpublish', [WorkProcessController::class, 'unpublish'])->name('unpublish'); Route::post('{workProcess}/archive', [WorkProcessController::class, 'archive'])->name('archive'); Route::post('{workProcess}/restore', [WorkProcessController::class, 'restore'])->name('restore'); Route::post('{workProcess}/duplicate', [WorkProcessController::class, 'duplicate'])->name('duplicate'); Route::post('{workProcess}/move-up', [WorkProcessController::class, 'move'])->defaults('direction','up')->name('move-up'); Route::post('{workProcess}/move-down', [WorkProcessController::class, 'move'])->defaults('direction','down')->name('move-down'); Route::get('{workProcess}/preview', [WorkProcessController::class, 'preview'])->name('preview'); Route::post('{workProcess}/relations', [WorkProcessController::class, 'relations'])->name('relations');
         Route::post('{workProcess}/stages', [WorkProcessChildController::class, 'storeStage'])->name('stages.store'); Route::delete('{workProcess}/stages/{stage}', [WorkProcessChildController::class, 'destroyStage'])->name('stages.destroy'); Route::post('{workProcess}/stages/{stage}/move', [WorkProcessChildController::class, 'moveStage'])->name('stages.move'); Route::post('{workProcess}/stages/{stage}/deliverables', [WorkProcessChildController::class, 'storeDeliverable'])->name('deliverables.store'); Route::delete('{workProcess}/stages/{stage}/deliverables/{deliverable}', [WorkProcessChildController::class, 'destroyDeliverable'])->name('deliverables.destroy'); Route::post('{workProcess}/stages/{stage}/deliverables/{deliverable}/move', [WorkProcessChildController::class, 'moveDeliverable'])->name('deliverables.move');
     });
+
+
+    foreach ([
+        'clients' => ClientController::class,
+        'testimonials' => TestimonialController::class,
+        'statistics' => StatisticController::class,
+    ] as $prefix => $controller) {
+        Route::prefix("content/{$prefix}")->name("admin.{$prefix}.")->middleware('throttle:60,1')->controller($controller)->group(function () use ($prefix) {
+            $parameter = $prefix === 'statistics' ? 'statistic' : rtrim($prefix, 's');
+            Route::get('/', 'index')->name('index'); Route::get('create', 'create')->name('create'); Route::post('/', 'store')->name('store');
+            Route::get("{{$parameter}}/edit", 'edit')->name('edit'); Route::match(['put', 'patch'], "{{$parameter}}", 'update')->name('update');
+            foreach (['publish', 'schedule', 'unpublish', 'archive', 'restore', 'duplicate'] as $action) { Route::post("{{$parameter}}/{$action}", $action)->name($action); }
+            Route::post("{{$parameter}}/move-up", 'move')->defaults('direction', 'up')->name('move-up'); Route::post("{{$parameter}}/move-down", 'move')->defaults('direction', 'down')->name('move-down'); Route::get("{{$parameter}}/preview", 'preview')->name('preview');
+            if ($prefix === 'clients') { Route::post('{client}/relations', 'relations')->name('relations'); }
+        });
+    }
 
 
 });

@@ -1,0 +1,2 @@
+<?php
+namespace App\Http\Controllers; use App\Domain\Testimonials\TestimonialViewData; use Illuminate\Contracts\View\View; use Illuminate\Http\Request; class PublicTestimonialController extends Controller { public function __invoke(Request $request,TestimonialViewData $data):View{return view('testimonials.index',['testimonials'=>$data->published()]+app(PublicSiteController::class)->sharedViewData($request));} }

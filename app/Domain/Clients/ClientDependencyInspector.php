@@ -1,0 +1,2 @@
+<?php
+namespace App\Domain\Clients; use App\Models\Client; final class ClientDependencyInspector { public function inspect(Client $item):array{$counts=['homepage'=>$item->homepageItems()->where('is_active',true)->count(),'navigation'=>$item->navigationItems()->where('is_active',true)->count(),'testimonials'=>$item->testimonials()->publiclyVisible()->count()];return ['counts'=>$counts,'blocked'=>array_sum($counts)>0];} }

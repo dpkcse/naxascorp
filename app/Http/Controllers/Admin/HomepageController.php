@@ -10,6 +10,9 @@ use App\Domain\PublicChrome\PublicAssetPath;
 use App\Domain\PublicChrome\PublicLink;
 use App\Http\Controllers\Controller;
 use App\Models\HomepageItem;
+use App\Models\Client;
+use App\Models\Testimonial;
+use App\Models\Statistic;
 use App\Models\Capability;
 use App\Models\WorkProcess;
 use App\Models\Industry;
@@ -46,9 +49,13 @@ class HomepageController extends Controller
         $capabilities = Capability::query()->whereNull('archived_at')->orderBy('title')->get(['id','title','status']);
         $workProcesses = WorkProcess::query()->whereNull('archived_at')->orderBy('title')->get(['id','title','status']);
 
+        $clients = Client::query()->whereNull('archived_at')->orderBy('name')->get(['id', 'name', 'status']);
+        $testimonials = Testimonial::query()->whereNull('archived_at')->orderBy('person_name')->get(['id', 'person_name', 'status']);
+        $statistics = Statistic::query()->whereNull('archived_at')->orderBy('label')->get(['id', 'label', 'value', 'status']);
+
         $solutions = Solution::query()->whereNull('archived_at')->orderBy('title')->get(['id', 'title', 'status']);
 
-        return view('admin.homepage.section', compact('definition', 'record', 'products', 'solutions', 'industries', 'capabilities', 'workProcesses'));
+        return view('admin.homepage.section', compact('definition', 'record', 'products', 'solutions', 'industries', 'capabilities', 'workProcesses', 'clients', 'testimonials', 'statistics'));
     }
 
     public function saveSettings(Request $request): RedirectResponse
@@ -154,6 +161,9 @@ class HomepageController extends Controller
         $definition = HomepageSectionRegistry::all()[$section->section_key];
         $type = $definition['item_type'];
         return [
+            'client_id' => [$section->section_key === 'clients' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Client::class, 'id')->whereNull('archived_at')],
+            'testimonial_id' => [$section->section_key === 'testimonials' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Testimonial::class, 'id')->whereNull('archived_at')],
+            'statistic_id' => [$section->section_key === 'statistics' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Statistic::class, 'id')->whereNull('archived_at')],
             'capability_id' => [$section->section_key === 'capabilities' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Capability::class, 'id')->whereNull('archived_at')],
             'industry_id' => [$section->section_key === 'industries' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Industry::class, 'id')->whereNull('archived_at')],
             'product_id' => [$section->section_key === 'featured_products' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Product::class, 'id')->whereNull('archived_at')],

@@ -3,7 +3,7 @@ namespace App\Domain\PublicChrome;
 use Illuminate\Support\Facades\Route;
 class PublicLink
 {
-    public const ROUTES = ['home'];
+    public const ROUTES = ['home','clients.index','testimonials.index'];
     public static function isSafeUrl(?string $url, bool $relative = true): bool
     {
         if (! is_string($url) || trim($url) === '' || preg_match('/[\x00-\x1F\x7F]/', $url)) { return false; }
