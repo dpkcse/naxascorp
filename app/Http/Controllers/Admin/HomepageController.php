@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Models\HomepageItem;
 use App\Models\HomepageSection;
 use App\Models\HomepageSetting;
+use App\Models\Product;
 use App\Models\Solution;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -35,9 +36,11 @@ class HomepageController extends Controller
         $definition = HomepageSectionRegistry::all()[$section] ?? abort(404);
         $record = HomepageSection::query()->where('section_key', $section)->with(['items' => fn ($query) => $query->orderBy('display_order')->orderBy('id')])->firstOrFail();
 
+        $products = Product::query()->whereNull('archived_at')->orderBy('title')->get(['id', 'title', 'status']);
+
         $solutions = Solution::query()->whereNull('archived_at')->orderBy('title')->get(['id', 'title', 'status']);
 
-        return view('admin.homepage.section', compact('definition', 'record', 'solutions'));
+        return view('admin.homepage.section', compact('definition', 'record', 'products', 'solutions'));
     }
 
     public function saveSettings(Request $request): RedirectResponse
@@ -143,6 +146,7 @@ class HomepageController extends Controller
         $definition = HomepageSectionRegistry::all()[$section->section_key];
         $type = $definition['item_type'];
         return [
+            'product_id' => [$section->section_key === 'featured_products' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Product::class, 'id')->whereNull('archived_at')],
             'solution_id' => [$section->section_key === 'featured_solutions' ? 'nullable' : 'prohibited', 'integer', Rule::exists(Solution::class, 'id')->whereNull('archived_at')],
             'item_type' => ['nullable', Rule::in(array_filter([$type, $definition['secondary_item_type']]))], 'title' => ['required', 'string', 'max:180'], 'eyebrow' => ['nullable', 'string', 'max:120'],
             'description' => ['nullable', 'string', 'max:'.($type === 'testimonial' ? 1000 : 1200)], 'secondary_text' => ['nullable', 'string', 'max:500'],

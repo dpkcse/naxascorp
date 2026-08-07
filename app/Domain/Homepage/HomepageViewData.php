@@ -58,7 +58,7 @@ final class HomepageViewData
         $sections = HomepageSection::query()
             ->when(! $preview, fn ($query) => $query->where('is_enabled', true))
             ->orderBy('display_order')->orderBy('id')
-            ->with(['items' => fn ($query) => $query->with('solution')->where('is_active', true)->orderBy('display_order')->orderBy('id')->limit(24)])
+            ->with(['items' => fn ($query) => $query->with(['solution','product'])->where('is_active', true)->orderBy('display_order')->orderBy('id')->limit(24)])
             ->limit(count($registry))->get()
             ->filter(fn (HomepageSection $section): bool => isset($registry[$section->section_key]))
             ->map(function (HomepageSection $section) use ($registry): array {
@@ -78,9 +78,9 @@ final class HomepageViewData
                     'width' => in_array($section->content_width, HomepageSectionRegistry::WIDTHS, true) ? $section->content_width : 'standard',
                     'tabs' => $section->items->where('item_type', $definition['secondary_item_type'])->take($definition['secondary_maximum'])->map(fn ($item): array => ['id' => $item->id, 'label' => $item->title, 'description' => $item->description, 'icon' => $item->icon])->values()->all(),
                     'items' => $section->items->where('item_type', $definition['item_type'])->take($definition['maximum'])->map(fn ($item): array => [
-                        'id' => $item->id, 'title' => ($item->solution?->isPubliclyVisible() ? $item->solution->title : $item->title), 'eyebrow' => $item->eyebrow, 'description' => ($item->solution?->isPubliclyVisible() ? $item->solution->short_description : $item->description), 'canonical_solution' => $item->solution?->isPubliclyVisible() ? ['url' => route('solutions.show', $item->solution->slug)] : null,
+                        'id' => $item->id, 'title' => ($item->product?->isPubliclyVisible() ? $item->product->title : ($item->solution?->isPubliclyVisible() ? $item->solution->title : $item->title)), 'eyebrow' => $item->eyebrow, 'description' => ($item->product?->isPubliclyVisible() ? $item->product->short_description : ($item->solution?->isPubliclyVisible() ? $item->solution->short_description : $item->description)), 'canonical_solution' => $item->solution?->isPubliclyVisible() ? ['url' => route('solutions.show', $item->solution->slug)] : null, 'canonical_product' => $item->product?->isPubliclyVisible() ? ['url' => route('products.show', $item->product->slug)] : null,
                         'secondary_text' => $item->secondary_text, 'highlighted_text' => $item->highlighted_text, 'icon' => $item->icon,
-                        'badge' => $item->badge, 'image_path' => PublicAssetPath::isSafe($item->solution?->featured_image_path) && $item->solution?->isPubliclyVisible() ? $item->solution->featured_image_path : (PublicAssetPath::isSafe($item->image_path) ? $item->image_path : null), 'mobile_image_path' => PublicAssetPath::isSafe($item->mobile_image_path) ? $item->mobile_image_path : null,
+                        'badge' => $item->badge, 'image_path' => PublicAssetPath::isSafe($item->product?->featured_image_path) && $item->product?->isPubliclyVisible() ? $item->product->featured_image_path : (PublicAssetPath::isSafe($item->solution?->featured_image_path) && $item->solution?->isPubliclyVisible() ? $item->solution->featured_image_path : (PublicAssetPath::isSafe($item->image_path) ? $item->image_path : null)), 'mobile_image_path' => PublicAssetPath::isSafe($item->mobile_image_path) ? $item->mobile_image_path : null,
                         'image_alt' => $item->image_alt, 'primary_cta' => $this->link($item->primary_cta_label, $item->primary_cta_url),
                         'secondary_cta' => $this->link($item->secondary_cta_label, $item->secondary_cta_url), 'organization' => $item->organization,
                         'value' => $item->value, 'prefix' => $item->prefix, 'suffix' => $item->suffix, 'rating' => $item->rating,
