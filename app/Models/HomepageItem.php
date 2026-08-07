@@ -10,11 +10,21 @@ class HomepageItem extends Model
 {
     use InvalidatesHomepage;
 
-    protected $fillable = ['solution_id', 'product_id', 'industry_id', 'capability_id', 'client_id', 'testimonial_id', 'statistic_id', 'item_type', 'title', 'eyebrow', 'description', 'secondary_text', 'highlighted_text', 'icon', 'badge', 'image_path', 'mobile_image_path', 'image_alt', 'primary_cta_label', 'primary_cta_url', 'secondary_cta_label', 'secondary_cta_url', 'organization', 'value', 'prefix', 'suffix', 'rating', 'published_on', 'display_order', 'is_active'];
+    protected $fillable = ['article_id', 'faq_id', 'solution_id', 'product_id', 'industry_id', 'capability_id', 'client_id', 'testimonial_id', 'statistic_id', 'item_type', 'title', 'eyebrow', 'description', 'secondary_text', 'highlighted_text', 'icon', 'badge', 'image_path', 'mobile_image_path', 'image_alt', 'primary_cta_label', 'primary_cta_url', 'secondary_cta_label', 'secondary_cta_url', 'organization', 'value', 'prefix', 'suffix', 'rating', 'published_on', 'display_order', 'is_active'];
 
     protected function casts(): array
     {
         return ['is_active' => 'boolean', 'published_on' => 'date'];
+    }
+
+    public function article(): BelongsTo
+    {
+        return $this->belongsTo(Article::class);
+    }
+
+    public function faq(): BelongsTo
+    {
+        return $this->belongsTo(Faq::class);
     }
 
     public function solution(): BelongsTo
