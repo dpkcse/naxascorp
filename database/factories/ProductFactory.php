@@ -1,0 +1,4 @@
+<?php
+namespace Database\Factories; use App\Models\Product; use Illuminate\Database\Eloquent\Factories\Factory;
+/** @extends Factory<Product> */
+class ProductFactory extends Factory {protected $model=Product::class;public function definition():array{return ['title'=>fake()->unique()->sentence(3),'slug'=>fake()->unique()->slug(),'short_description'=>fake()->sentence(),'template'=>'standard','hero_style'=>'standard','status'=>'draft','display_order'=>1,'robots_index'=>true,'robots_follow'=>true];}public function published():static{return $this->state(fn()=>['status'=>'published','published_at'=>now(),'scheduled_for'=>null,'archived_at'=>null]);}public function scheduled($when=null):static{return $this->state(fn()=>['status'=>'scheduled','scheduled_for'=>$when?:now()->addHour(),'published_at'=>null]);}public function archived():static{return $this->state(fn()=>['status'=>'archived','archived_at'=>now(),'published_at'=>null]);}}

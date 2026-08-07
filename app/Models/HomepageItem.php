@@ -10,7 +10,7 @@ class HomepageItem extends Model
 {
     use InvalidatesHomepage;
 
-    protected $fillable = ['solution_id', 'item_type', 'title', 'eyebrow', 'description', 'secondary_text', 'highlighted_text', 'icon', 'badge', 'image_path', 'mobile_image_path', 'image_alt', 'primary_cta_label', 'primary_cta_url', 'secondary_cta_label', 'secondary_cta_url', 'organization', 'value', 'prefix', 'suffix', 'rating', 'published_on', 'display_order', 'is_active'];
+    protected $fillable = ['solution_id', 'product_id', 'item_type', 'title', 'eyebrow', 'description', 'secondary_text', 'highlighted_text', 'icon', 'badge', 'image_path', 'mobile_image_path', 'image_alt', 'primary_cta_label', 'primary_cta_url', 'secondary_cta_label', 'secondary_cta_url', 'organization', 'value', 'prefix', 'suffix', 'rating', 'published_on', 'display_order', 'is_active'];
 
     protected function casts(): array
     {
@@ -20,6 +20,11 @@ class HomepageItem extends Model
     public function solution(): BelongsTo
     {
         return $this->belongsTo(Solution::class);
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
     }
 
     public function section(): BelongsTo
